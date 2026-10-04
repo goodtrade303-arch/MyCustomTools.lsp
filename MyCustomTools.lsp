@@ -3,7 +3,7 @@
 ;;; =========================================================================
 
 ;; 1. Global Version (قم بزيادة هذا الرقم كلما أضفت أوامر جديدة)
-(setq *AH-VER* "1.1")
+(setq *AH-VER* "1.0")
 
 ;; -------------------------------------------------------------------------
 ;; 2. Your Custom Commands & LISP Tools
@@ -1895,6 +1895,47 @@
   blocked
 )
 
+;; ----------------------------------------------------------------------------
+;; Put an object below another object using AutoCAD's SortentsTable.
+;; This is the ActiveX equivalent of DRAWORDER -> Move Below and avoids
+;; COMMAND/PEDIT completely. Here it is used so the SOLID hatch stays below
+;; the column boundary, making the boundary clearly visible on top.
+;; ----------------------------------------------------------------------------
+(defun HCOL:PutObjectBelow (obj target owner / extDict sortObj arr res)
+  (setq extDict
+        (vl-catch-all-apply 'vla-GetExtensionDictionary (list owner)))
+  (if (vl-catch-all-error-p extDict)
+      nil
+      (progn
+        (setq sortObj
+              (vl-catch-all-apply
+                'vla-GetObject
+                (list extDict "ACAD_SORTENTS")))
+
+        ;; Create the SortentsTable if this space does not have one yet.
+        (if (vl-catch-all-error-p sortObj)
+            (setq sortObj
+                  (vl-catch-all-apply
+                    'vla-AddObject
+                    (list extDict "ACAD_SORTENTS" "AcDbSortentsTable")))
+        )
+
+        (if (vl-catch-all-error-p sortObj)
+            nil
+            (progn
+              (setq arr (vlax-make-safearray vlax-vbObject '(0 . 0)))
+              (vlax-safearray-put-element arr 0 obj)
+              (setq res
+                    (vl-catch-all-apply
+                      'vla-MoveBelow
+                      (list sortObj arr target)))
+              (not (vl-catch-all-error-p res))
+            )
+        )
+      )
+  )
+)
+
 (defun HCOL:CreateSolidHatch (colObj modelSpace / hatchObj sa vArr ok doc layers hatchLayer)
   ;; Dedicated layer for HCOL solid hatches.
   ;; The column remains on its original layer.
@@ -1935,6 +1976,12 @@
                 'vla-put-Layer
                 (list hatchObj "SH-COLUMN"))
               (vl-catch-all-apply 'vla-Evaluate (list hatchObj))
+
+              ;; IMPORTANT: keep the hatch BELOW its column boundary.
+              ;; This makes the duplicated column outline visible above
+              ;; the solid fill without changing the draw order of the
+              ;; rest of the drawing.
+              (HCOL:PutObjectBelow hatchObj colObj modelSpace)
             )
             (vl-catch-all-apply 'vla-Delete (list hatchObj))
         )
