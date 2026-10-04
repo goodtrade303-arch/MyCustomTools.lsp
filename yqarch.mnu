@@ -90,7 +90,7 @@ $P0=SNAP $p0=*
    [Convert to Excel   *****<T2E>]^c^c^pYQ_TEXTS2EXCEL ^p
    [Break Text           ***<ttB>]^c^c^pYQ_TEXT_BREAK2 ^p
    [--]
-[<-YQArch Uninstall  *<yquninst>]^c^c^pYQ_UNINSTALL ^P
+[<-AH_Updater  *<AHU>]^c^CAHU
 [--]
 [->Plane Wall/Column]
    [Draw Axis Line          *<ax>]^c^c^pYQ_AXISLINE ^p
