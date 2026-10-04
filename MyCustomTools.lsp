@@ -9,6 +9,28 @@
 ;; 2. Your Custom Commands & LISP Tools
 ;; -------------------------------------------------------------------------
 
+
+;;; =========================================================================
+;;; AH Tools - Updater Shortcut Command (AHU)
+;;; =========================================================================
+(defun c:AHU (/ updaterPath)
+  (setq updaterPath "C:\\YQArch\\sys\\AH_Updater.exe")
+  (if (findfile updaterPath)
+    (progn
+      (startapp updaterPath)
+      (princ "\n[AH Tools] Launching Updater...")
+    )
+    (alert "Error: AH_Updater.exe not found at C:\\YQArch\\sys\\AH_Updater.exe")
+  )
+  (princ)
+)
+
+
+
+
+
+
+
 (defun c:ar ()
 
 (setq AnItem (getvar "OSMODE"))
