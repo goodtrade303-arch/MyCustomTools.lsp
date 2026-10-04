@@ -1,0 +1,1381 @@
+//
+//  ¡°Ô´ÈªÉè¼Æ¡±¸½¼Ó²Ëµ¥ÎÄ¼þ£¬ÓÃÓÚÔÚÔ­°æAutoCAD²Ëµ¥ÉÏÐÂÔöÒ»Ïî
+//   ¿ÉÒÔÓÃÓÚ AutoCAD 2000 ÒÔÉÏ¸÷¸ö°æ±¾
+//   ±¾²Ëµ¥Ïî¿ÉÀûÓÃÃüÁî"YQ_MENU"»ò"YQ_LANG"¼ÓÔØ
+//
+***MENUGROUP=yqarch
+
+
+//
+//   Begin System Pointing Device Menus
+//
+***AUX1
+//$M=$(if,$(eq,$(substr,$(getvar,cmdnames),1,5),GRIP_),$P0=ACAD.GRIPS $P0=*);
+endp,int,mid,qua,nod
+$P0=SNAP $p0=*
+^C^C
+^B
+^O
+^G
+^D
+^E
+^T
+
+***AUX2
+// Shift + button
+^O
+^O
+^O
+
+***AUX3
+// Control + button
+$P0=yqarch.yqapp $p0=*
+
+***AUX4
+// Control + shift + button
+$P0=SNAP $p0=*
+
+
+
+***POP37
+**yqarche
+[YQARCH..BY AH]
+[->System Setup]
+   [User Preferences  ****<yqsys>]^c^c^pYQ_SYS_SETTING ^P
+   [Command Pandect     *****<yq>]^c^c^pYQARCH ^P
+   [Show YQArch Toolbars   *<tbA>]^c^c^pYQ_TOOLBARSON ^P
+   [Hide YQArch Toolbars  *<tbAF>]^c^c^pYQ_TOOLBARSOFF ^P
+   [--]
+   [Select Current User *<yquser>]^c^c^pYQ_SETUSER ^P
+   [Select Language     *<yqlang>]^c^c^pYQ_LANG ^P
+   [Set Default Units  *<yqunits>]^c^c^pYQ_SETUNITS ^P
+   [Reload YQArch Menu  *<yqmenu>]^c^c^pYQ_MENU ^P
+   [--]
+   [Set Dwg/Sym. Scale  *****<sd>]^c^c^pYQ_SETDWGSCALE ^P
+   [Drawing Frame (A0-A4)  **<tk>]^c^c^pYQ_DWGFRAME ^p
+   [--]
+   [YQArch Help         *<yqhelp>]^c^c^pYQ_HELP ^P
+   [YQArch Version       *<yqver>]^c^c^pYQ_VER ^P
+   [YQArch Website       *<yqweb>]^c^c^pYQ_WEBSITE ^P
+   [Tutorial Website             ]^c^c^p(yq_browser "http://bigd.ys168.com") ^P
+   [Donate/Support      *<donate>]^c^c^pYQ_DONATE ^P
+   [--]
+   [YQArch QQ Group1:   119803917]^c^c^p(yq_qqgroup "119803917") ^P
+   [YQArch QQ Group2:    41952877]^c^c^p(yq_qqgroup "41952877") ^P
+   [YQArch QQ Group3:    41195287]^c^c^p(yq_qqgroup "41195287") ^P
+   [Decoration Group4:  390339771]^c^c^p(yq_qqgroup "390339771") ^P
+   [Decoration Group6:  363273173]^c^c^p(yq_qqgroup "363273173") ^P
+   [Decoration Group8:  758743236]^c^c^p(yq_qqgroup "758743236") ^P
+   [Author QQ:575825448,970274029]^c^c^p(yq_qqmsg "970274029") ^P
+   [Send Email to Author         ]^c^c^p(yq_mailto "575825448@qq.com") ^P
+   [--]
+   [About YQArch       *<yqabout>]^c^c^pYQ_ABOUT ^p
+   [--]
+   [<-YQArch Uninstall  *<yquninst>]^c^c^pYQ_UNINSTALL ^P
+[--]
+[->AH-NEW]
+   [Area and volume 2      ***<a1>]^c^Ca1
+   [Close Pline/Arc/Line ***<xxC>]^c^c^pYQ_PLINE_CLOSE ^p
+   [--]
+   [Draw Column 2       ***<CLL>]^c^Ccll
+      [Cut &  Hatch column       ***<HCOL>]^c^Chcol
+   [Convert to Column    **<xxzz>]^c^c^pYQ_PLINE2COLUMN ^p
+   [--]
+   [Draw lines dim with table       ***<zdmaLL>]^c^Czdmall
+   [Merge Overlap Lines    **<LU>]^c^c^pYQ_LINEUNION ^p
+   [--]
+   [Bricks - Area & volume       ***<cbv>]^c^Ccbv
+   [--]
+   [Export to Excel       ***<v2xls>]^c^Cv2xls
+   [Convert to Excel   *****<T2E>]^c^c^pYQ_TEXTS2EXCEL ^p
+   [Break Text           ***<ttB>]^c^c^pYQ_TEXT_BREAK2 ^p
+   [--]
+[<-YQArch Uninstall  *<yquninst>]^c^c^pYQ_UNINSTALL ^P
+[--]
+[->Plane Wall/Column]
+   [Draw Axis Line          *<ax>]^c^c^pYQ_AXISLINE ^p
+   [Draw Grid Axis        **<zxw>]^c^c^pYQ_GRIDAXIS ^p
+   [--]
+   [Draw Wall           *****<ww>]^c^c^pYQ_WALL ^p
+   [Wall Scissor        *****<TW>]^c^c^pYQ_TRIM_FIX_WALL ^p
+   [Change Wall Thick.  ****<wwT>]^c^c^pYQ_WALL_CHGTHK ^p
+   [Axis Line to Walls   ***<Xww>]^c^c^pYQ_LINE2WALL ^p
+   [Wall Offseting        **<wwO>]^c^c^pYQ_WALL_CDOFFSET ^p
+   [--]
+   [Rebuilt wall Axis     **<wwA>]^c^c^pYQ_WALL2AXIS ^p
+   [Fill in Walls/Columns **<wwF>]^c^c^pYQ_FILL_WALL ^p
+   [--]
+   [Rectangular Column  ****<zzR>]^c^c^pYQ_R_COLUMN ^p
+   ['O'-Shape Column    ****<zzC>]^c^c^pYQ_O_COLUMN ^p
+   ['L'-Shape Column     ***<zzL>]^c^c^pYQ_L_COLUMN ^p
+   ['T'-Shape Column     ***<zzT>]^c^c^pYQ_T_COLUMN ^p
+   ['+'-Shape Column     ***<zzX>]^c^c^pYQ_C_COLUMN ^p
+   [--]
+   [Arrange Columns      **<zzBZ>]^c^c^pYQ_AXIS_COLUMN ^p
+   [Convert to Column    **<xxzz>]^c^c^pYQ_PLINE2COLUMN ^p
+   [Fill in Columns       **<zzF>]^c^c^pYQ_FILL_COLUMN ^p
+   [--]
+   [<-Del Win/Dr/Wall/Col  ****<EW>]^c^c^pYQ_ERASE_WALL ^p
+[->Plane Window/Door]
+   [Open Door on Wall   *****<AD>]^c^c^pYQ_HOLE_DOOR ^p
+   [Draw a Door          ***<AD2>]^c^c^pYQ_DOOR ^p
+   [Open Window on Wall *****<AW>]^c^c^pYQ_HOLE_WIN ^p
+   [Draw a Window        ***<AW2>]^c^c^pYQ_WIN ^p
+   [Replace Window/Door  ****<TD>]^c^c^pYQ_WINDOOR_REPLACE ^p
+   [Auto Open Hole         **<HO>]^c^c^pYQ_HOLE ^p
+   [--]
+   [Open Pocket Door   *****<ADT>]^c^c^pYQ_HOLE_POCKETDOOR ^p
+   [Draw a Pocket Door  ***<ADT2>]^c^c^pYQ_POCKETDOOR ^p
+   [Replace Pocket Door ****<TDD>]^c^c^pYQ_POCKETDOOR_REPLACE ^p
+   [--]
+   [Open Param Window   *****<WD>]^c^c^pYQ_HOLE_WINDOW ^p
+   [Draw a Param Window  ***<WD2>]^c^c^pYQ_WINDOW ^p
+   [Replace Param Window****<TDW>]^c^c^pYQ_WINDOW_REPLACE ^p
+   [--]
+   [Open Corner Window *****<WDZ>]^c^c^pYQ_HOLE_CORNERWINDOW ^p
+   [Replace Cor. Window ****<TDZ>]^c^c^pYQ_CWINDOW_REPLACE ^p
+   [--]
+   [Doorsill Manager      **<MKX>]^c^c^pYQ_DOORSILL ^p
+   [Door Opening Manager  **<MDX>]^c^c^pYQ_DOOROPENING ^p
+   [--]
+   [Lines to Windows      **<xWD>]^c^c^pYQ_LINE2WINDOW ^p
+   [Change WD/DR Width   ****<CW>]^c^c^pYQ_WIDTH_WINDOOR ^p
+   [Move Window/Door     ****<VW>]^c^c^pYQ_MOVE_WINDOOR ^p
+   [--]
+   [Repair Win/Door/Col  ****<XF>]^c^c^pYQ_REPAIR ^p
+   [Move and Repair      ****<vX>]^c^c^pYQ_MOVEANDFIX ^p
+   [Copy and Repair      ****<cX>]^c^c^pYQ_COPYANDFIX ^p
+   [Mirror and Repair   ****<rrX>]^c^c^pYQ_MIRRORANDFIX ^p
+   [--]
+   [Turn Windows/Doors   ****<FZ>]^c^c^pYQ_OVERTURN ^p
+   [Match/Repl. Win/Door****<ssB>]^c^c^pYQ_MATCH_BLOCK ^p
+   [--]
+   [Del Win/Dr/Wall/Col  ****<EW>]^c^c^pYQ_ERASE_WALL ^p
+   [--]
+   [<-Window Serial Number ***<wbh>]^c^c^pYQ_WINSERIALNUMBER ^p
+[--]
+[->Building Components]
+   [Index of Components *****<gj>]^c^c^pYQ_SLDCOMPONENTS ^p
+   [--]
+   [Plan/Elev Escalator ****<ltF>]^c^c^pYQ_ESCALATOR ^p
+   [--]
+   [Plan of Staircase   ****<ltJ>]^c^c^pYQ_STAIRCASE_PLAN ^p
+   [Plan of Arc Staircase***<ltA>]^c^c^pYQ_ARCSTAIR_PLAN ^p
+   [Plan of Elevator      **<DTJ>]^c^c^pYQ_LIFT_PLAN ^p
+   [--]
+   [Elevation of Door   ****<adE>]^c^c^pYQ_DOOR_ELEVATION ^p
+   [Section of Door     ****<adS>]^c^c^pYQ_DOOR_SECTION ^p
+   [Section of Bay Win  ****<wtS>]^c^c^pYQ_BAYWIN_SECTION ^p
+   [Elevation of Window ****<wdE>]^c^c^pYQ_WINDOW_ELEVATION ^p
+   [Section of Window     **<WDS>]^c^c^pYQ_WINDOW_SECTION ^p
+   [Elev/Sect of Shutter   **<BY>]^c^c^pYQ_SHUTTER ^p
+   [Curtain Wall Glass    **<mBL>]^c^c^pYQ_CURTAINGLASS ^p
+   [--]
+   [Lines to Window Elev.***<wdD>]^c^c^pYQ_LINES2WINELEV ^p
+   [SN. to Window Elev.   **<t2w>]^c^c^pYQ_SN2WINELEV ^p
+   [Elevation Curtain Wall***<MQ>]^c^c^pYQ_CURTAINWALL ^p
+   [Section of Partition  **<MQS>]^c^c^pYQ_GLASS_PARTITION ^p
+   [Elevation Banister    ***<LG>]^c^c^pYQ_BANISTER ^p
+   [--]
+   [Section of Staircase****<ltP>]^c^c^pYQ_STAIRCASE_SECTION ^p
+   [Section of Stpes     **<lxtb>]^c^c^pYQ_STEP_SECTION ^p
+   [--]
+   [Section of Waterproof **<FSC>]^c^c^pYQ_WATERPROOF ^p
+   [<-Section of Stucco       *<FN>]^c^c^pYQ_STUCCO ^p
+[->Decoration Components]
+   [Index of Decoration *****<zs>]^c^c^pYQ_SLDDECORATION ^p
+   [--]
+   [Arrange Furniture   *****<JJ>]^c^c^pYQ_AUTOFURNITURE ^p
+   [Arrange WC/shower   *****<WC>]^c^c^pYQ_ARRANGEWC ^p
+   [--]
+   [Chest Plan             **<YG>]^c^c^pYQ_CHESTPLAN ^p
+   [Curtain Plan          **<CLP>]^c^c^pYQ_CURTAINPLAN ^p
+   [Plaster String Plan   **<SGX>]^c^c^pYQ_PLASTERSTRINGPLAN ^p
+   [Plan of Cupboard        *<GZ>]^c^c^pYQ_CUPBOARDPLAN ^p
+   [Elevation of Cupboard **<GZE>]^c^c^pYQ_CUPBOARDELEV ^p
+   [--]
+   [Section of Stone Tile***<stB>]^c^c^pYQ_STONETILE ^p
+   [Section of Wooden Frame *<MF>]^c^c^pYQ_WOODENFRAME ^p
+   [Boards Arry           **<CBZ>]^c^c^pYQ_ARRAY_BOARDS ^p
+   [--]
+   [Section of Blockboard  *<MGB>]^c^c^pYQ_BLOCKBOARD ^p
+   [Section of Plywood      *<JB>]^c^c^pYQ_PLYWOOD ^p
+   [Section Wood Flooring  *<MDB>]^c^c^pYQ_WOODFLOORING ^p
+   [Section of Glass        *<BL>]^c^c^pYQ_GLASS ^p
+   [Section Gypsum Board ***<SGB>]^c^c^pYQ_GYPSUMBOARD ^p
+   [Section Light Trough***<THDC>]^c^c^pYQ_LIGHTTROUGH ^p
+   [Partition Wall         **<GQ>]^c^c^pYQ_PARTITIONWALL ^p
+   [--]
+   [Section of Formed Steel *<XG>]^c^c^pYQ_FORMEDSTEEL ^p
+   [--]
+   [Cotton Insulation      *<BWM>]^c^c^pYQ_INSULATION ^p
+   [Welding Line            *<HF>]^c^c^pYQ_WELDINGLINE ^p
+   [Draw Hose               *<RG>]^c^c^pYQ_HOSE ^p
+   [Draw Pipe               *<GX>]^c^c^pYQ_PIPE ^p
+   [--]
+   [Hole on Board           *<KD>]^c^c^pYQ_BOARDHOLE ^p
+   [Cylinder shadow        *<YZX>]^c^c^pYQ_CYLINDERSHADOW ^p
+   [Back-Bolt Hole        **<BSK>]^c^c^pYQ_BACKBOLTHOLE ^p
+   [--]
+   [Arrange Lamps           *<DJ>]^c^c^pYQ_AUTOLAMPS ^p
+   [Random Spread          *<MTX>]^c^c^pYQ_RANDOMSPREAD ^p
+   [<-Indoor Elevation      ***<LM>]^c^c^pYQ_INDOORELEV ^p
+[->Architectural Symbols]
+   [Index of Symbols    *****<fh>]^c^c^pYQ_SLDSYMBOLS ^p
+   [--]
+   [Arrange Axis Symbol ****<aZH>]^c^c^pYQ_AUTO_AXIS_DIM ^p
+   [Draw Axis Symbols    ****<ZH>]^c^c^pYQ_SYMBOL_AXIS_C ^p
+   [--]
+   [Geodesic Coordinates ****<ZB>]^c^c^pYQ_GEODESIC_COORDINATES ^p
+   [Designed Elevation   ****<BG>]^c^c^pYQ_DESIGNED_ELEVATION ^p
+   [Contour Elevation      *<xBG>]^c^c^pYQ_CONTOUR_ELEVATION ^p
+   [--]
+   [Section Plane Symbol  **<pqf>]^c^c^pYQ_SYMBOL_SECTIONPLANE ^p
+   [Section Symbol        **<dmf>]^c^c^pYQ_SYMBOL_SECTIONCUTTER ^p
+   [Slope Symbol           **<PD>]^c^c^pYQ_SYMBOL_GRADIENT ^p
+   [Disconnection line     **<ZX>]^c^c^pYQ_DISCONNECTION_LINE ^p
+   [Pipe Cutting Symbol    *<GPX>]^c^c^pYQ_PIPECUTTING ^p
+   [Symmetry Axis          *<dcz>]^c^c^pYQ_SYMMETRY_AXIS ^p
+   [Central Line           *<zxx>]^c^c^pYQ_CENTRAL_LINE ^p
+   [--]
+   [Wire Surround          *<aCC>]^c^c^pYQ_WIRESURROUND ^p
+   [Erase Surround         *<eCC>]^c^c^pYQ_ERASESURROUND ^p
+   [--]
+   [Bent Arrow             *<aaW>]^c^c^pYQ_BENTARROW ^p
+   [<-Entrance Arrow         *<aaE>]^c^c^pYQ_ENTRANCEARROW ^p
+[->Indexer Symbols]
+   [Index of Indexers   *****<sy>]^c^c^pYQ_SLDINDEXERS ^p
+   [--]
+   [Section Symbol 1     ***<sy1>]^c^c^pYQ_IDENTIFIER1 ^p
+   [Section Symbol 2     ***<sy2>]^c^c^pYQ_IDENTIFIER2 ^p
+   [Section Symbol 3     ***<sy3>]^c^c^pYQ_IDENTIFIER3 ^p
+   [Elev Indexer 4 in 1   ***<i0>]^c^c^pYQ_ELEVINDEXER4IN1 ^p
+   [Elev Indexer 1         **<i1>]^c^c^pYQ_ELEVINDEXER1 ^p
+   [Elev Indexer 2         **<i2>]^c^c^pYQ_ELEVINDEXER2 ^p
+   [Elev Indexer 3         **<i3>]^c^c^pYQ_ELEVINDEXER3 ^p
+   [Elev Indexer 4         **<i4>]^c^c^pYQ_ELEVINDEXER4 ^p
+   [--]
+   [Detail DWG Symbol 1   **<xt1>]^c^c^pYQ_DETAILSYMBOL1 ^p
+   [Detail DWG Symbol 2   **<xt2>]^c^c^pYQ_DETAILSYMBOL2 ^p
+   [--]
+   [User Indexer 1        ***<s1>]^c^c^pYQ_INDEXER1 ^p
+   [User Indexer 2        ***<s2>]^c^c^pYQ_INDEXER2 ^p
+   [User Indexer 3        ***<s3>]^c^c^pYQ_INDEXER3 ^p
+   [User Indexer 4        ***<s4>]^c^c^pYQ_INDEXER4 ^p
+   [User Indexer 5        ***<s5>]^c^c^pYQ_INDEXER5 ^p
+   [User Indexer 6        ***<s6>]^c^c^pYQ_INDEXER6 ^p
+   [User Indexer 7        ***<s7>]^c^c^pYQ_INDEXER7 ^p
+   [User Indexer 8        ***<s8>]^c^c^pYQ_INDEXER8 ^p
+   [User Indexer 9        ***<s9>]^c^c^pYQ_INDEXER9 ^p
+   [--]
+   [Arrow Leader        ****<aax>]^c^c^pYQ_LEADER ^p
+   [Multi-Point Leader ****<aaxx>]^c^c^pYQ_MPTLEADER ^p
+   [Vertical MP Leader ****<aayy>]^c^c^pYQ_MPTLEADER_Y ^p
+   [Add/Remove Vertexes  ***<aav>]^c^c^pYQ_LEADER_VERTEXES ^p
+   [Add Leader Arrows    ***<aaJ>]^c^c^pYQ_LEADER_ADDARROW ^p
+   [--]
+   [<-Deco. Drawing Title   ***<bt>]^c^c^pYQ_DRAWINGTITLE ^p
+[->Statistics Tools]
+   [Index of Statistics *****<tj>]^c^c^pYQ_SLDSTATISTICS ^p
+   [--]
+   [Select Easy         *****<ss>]^c^c^pXC_SS ^p
+   [--]
+   [Auto Serial Number *****<aBH>]^c^c^pYQ_AUTOSERIALNUMBER ^p
+   [Empty Table           **<Kbg>]^c^c^pYQ_EMPTYTABLE ^p
+   [Table Texts Aligning  **<bgZ>]^c^c^pYQ_TEXT2CENTER ^p
+   [Accumulate Cell Area  **<tMJ>]^c^c^pYQ_CALC_CELLAREA ^p
+   [Convert to Excel   *****<T2E>]^c^c^pYQ_TEXTS2EXCEL ^p
+   [Texts to ACAD TABLE   **<Zbg>]^c^c^pYQ_TEXTS2ACADTABLE ^p
+   [--]
+   [Win/Door List      *****<MCB>]^c^c^pYQ_WINDOOR_LIST ^p
+   [Blocks List           **<bbL>]^c^c^pYQ_BLOCK_LIST ^p
+   [Block Attr/Dyna List  **<sxL>]^c^c^pYQ_BLOCKATT_LIST ^p
+   [Collect Coordinates   **<zZB>]^c^c^pYQ_COORDINATE_LIST ^p
+   [Collect any Strings  ***<ttQ>]^c^c^pYQ_STRING_LIST ^p
+   [Material List         **<CLB>]^c^c^pYQ_MATERIAL_LIST ^p
+   [--]
+   [Area and volume       ***<ar>]^c^Car
+   [Accumulate Area       ***<MJ>]^c^c^pYQ_CALC_SUMAREA ^p
+   [Area to Text          **<pMJ>]^c^c^pYQ_ASSO_AREA ^p
+   [Accumulate Perimeter   **<ZC>]^c^c^pYQ_CALC_PERIMETER ^p
+   [Perimeter to Text     **<pZC>]^c^c^pYQ_ASSO_PERIMETER ^p
+   [Calculate Weight       **<ZL>]^c^c^pYQ_CALWEIGHT ^p
+   [--]
+   [Building Area Stat.   **<FTB>]^c^c^pYQ_AREASTAT ^p
+   [--]
+   [~===Mathematical operation=== ]
+   [Addition(+)             **<+>]^c^c^pYQ_CALC_ADDITION ^p
+   [Subtraction(-)           *<->]^c^c^pYQ_CALC_SUBTRATION ^p
+   [Multiplication(*)        *<*>]^c^c^pYQ_CALC_MULTIPLICATION ^p
+   [Division(/)              *</>]^c^c^pYQ_CALC_DIVISION ^p
+   [--]
+   [<-Eval. Expression        *<JS>]^c^c^pYQ_CALC_EXPRESSION ^p
+[--]
+[->Text Content]
+   [->Preset Text Height]
+     [ 2   mm](progn (setq YQ_T_HEIGHT 2.0)(setvar "TEXTSIZE" (* (getvar "dimscale") 2.0)))
+     [ 2.5 mm](progn (setq YQ_T_HEIGHT 2.5)(setvar "TEXTSIZE" (* (getvar "dimscale") 2.5)))
+     [ 3   mm](progn (setq YQ_T_HEIGHT 3.0)(setvar "TEXTSIZE" (* (getvar "dimscale") 3.0)))
+     [ 3.5 mm](progn (setq YQ_T_HEIGHT 3.5)(setvar "TEXTSIZE" (* (getvar "dimscale") 3.5)))
+     [ 4   mm](progn (setq YQ_T_HEIGHT 4.0)(setvar "TEXTSIZE" (* (getvar "dimscale") 4.0)))
+     [ 5   mm](progn (setq YQ_T_HEIGHT 5.0)(setvar "TEXTSIZE" (* (getvar "dimscale") 5.0)))
+     [ 6   mm](progn (setq YQ_T_HEIGHT 6.0)(setvar "TEXTSIZE" (* (getvar "dimscale") 6.0)))
+     [ 8   mm](progn (setq YQ_T_HEIGHT 8.0)(setvar "TEXTSIZE" (* (getvar "dimscale") 8.0)))
+     [10   mm](progn (setq YQ_T_HEIGHT 10.0)(setvar "TEXTSIZE" (* (getvar "dimscale") 10.0)))
+     [12   mm](progn (setq YQ_T_HEIGHT 12.0)(setvar "TEXTSIZE" (* (getvar "dimscale") 12.0)))
+     [15   mm](progn (setq YQ_T_HEIGHT 15.0)(setvar "TEXTSIZE" (* (getvar "dimscale") 15.0)))
+     [20   mm](progn (setq YQ_T_HEIGHT 20.0)(setvar "TEXTSIZE" (* (getvar "dimscale") 20.0)))
+     [<-30   mm](progn (setq YQ_T_HEIGHT 30.0)(setvar "TEXTSIZE" (* (getvar "dimscale") 30.0)))
+   [--]
+   [User Dictionary    *****<DIC>]^c^c^pYQ_USERDICT ^p
+   [Translate Text         **<FY>]^c^c^pYQ_TRANSLATE ^p
+   [Update Text From List   *<EQ>]^c^c^pYQ_UPDTEXTLIST ^p
+   [--]
+   [Input a Text         ****<tt>]^c^c^pYQ_TEXT ^p
+   [Modify any Text     ****<ttE>]^c^c^pYQ_SUPEREDIT ^p
+   [Dictionary to Text    **<ttG>]^c^c^pYQ_DICT2TEXT ^p
+   [Create/Input Texts   ***<cTT>]^c^c^pYQ_HZ_TEXT ^p
+   [Edit/Output Texts    ***<CED>]^c^c^pYQ_HZ_EDIT ^p
+   [--]
+   [Replace/Calculate  *****<ttR>]^c^c^pYQ_TEXT_REPLACE ^p
+   [Replace Substrings   **<ttRS>]^c^c^pYQ_REPLACE_SUBSTRS ^p
+   [--]
+   [Join Texts           ***<ttA>]^c^c^pYQ_TEXT_APPEND ^p
+   [Merge multi-line Text **<ttJ>]^c^c^pYQ_JTEXT ^p
+   [Break Text           ***<ttB>]^c^c^pYQ_TEXT_BREAK2 ^p
+   [Text to Characters    *<ttBB>]^c^c^pYQ_ETEXT ^p
+   [--]
+   [Increment Duplicate  **<1234>]^c^c^pYQ_ARRAY_NUMBERS ^p
+   [Add Increment         **<INC>]^c^c^pYQ_INCREASE_NUMBERS ^p
+   [Increase Texts        **<ttZ>]^c^c^pYQ_INCREASE_TEXT ^p
+   [Seek Specific Text    **<ttF>]^c^c^pYQ_FINDTEXT ^p
+   [--]
+   [<-Exchange Content        *<JH>]^c^c^pYQ_EXCHANGELOCATION ^p
+[->Text Other]
+   [New Text Style       ***<ttN>]^c^c^pYQ_SLDSTYLES ^p
+   [--]
+   [Set Current Style    ***<ttS>]^c^c^pYQ_TEXT_CSTYLE ^p
+   [Update Text by Style ***<ttU>]^c^c^pYQ_TEXT_UPDATE ^p
+   [Auto Replace Fonts   **<ttRF>]^c^c^pYQ_REPLACEFONTS ^p
+   [--]
+   [Change Texts       *****<ttC>]^c^c^pYQ_CHANGETEXT ^p
+   [Change height/aspect  **<ttW>]^c^c^pYQ_TEXT_WIDTH ^p
+   [Reorder Table Texts ***<ttPX>]^c^c^pYQ_REORDERTEXTS ^p
+   [--]
+   [Text Alignment Left    *<ttL>]^c^c^pYQ_TEXT_ALIGNMENTLEFT ^p
+   [Text Alignment Right  *<ttLL>]^c^c^pYQ_TEXT_ALIGNMENTRIGHT ^p
+   [Restore Mirrored/Rot. *<ttRR>]^c^c^pYQ_TEXT_RESTOREMIRR ^p
+   [--]
+   [Convert Texts/Attdefs *<ttSX>]^c^c^pYQ_TEXT2ATTDEF ^p
+   [<-Explode Texts to Lines *<ttX>]^c^c^pYQ_TXTEXP ^p
+[->Dimension Draw]
+   [Set Dwg/sym. Scale  *****<sd>]^c^c^pYQ_SETDWGSCALE ^p
+   [--]
+   [Dim Linear           ****<dd>]^c^c^pYQ_DIM_LINEAR ^p
+   [Dim Aligned           **<ddX>]^c^c^pYQ_DIM_ALIGNED ^p
+   [Dim Baseline          **<ddB>]^c^c^pYQ_DIM_BASELINE ^p
+   [Dim Radius            **<ddR>]^c^c^pYQ_DIM_RADIUS ^p
+   [Dim Diameter           *<ddJ>]^c^c^pYQ_DIM_DIAMETER ^p
+   [Dim Angular           *<ddAN>]^c^c^pYQ_DIM_ANGULAR ^p
+   [Dim Arc Length       **<ddAR>]^c^c^pYQ_DIM_ARC ^p
+   [Dim 3 Point's Arc    **<ddA3>]^c^c^pYQ_DIM_ARC3PTS ^p
+   [Dim Quick             **<ddQ>]^c^c^pYQ_DIM_QDIM ^p
+   [--]
+   [Dim Closed Space    ****<ddZ>]^c^c^pYQ_DIM_CLOSEDSPACE ^p
+   [Dim Closed Pline   ****<ddZZ>]^c^c^pYQ_DIM_PLINE ^p
+   [Dim Pline/Lines     ***<ddSS>]^c^c^pYQ_DIM_POLYGONSIDES ^p
+   [--]
+   [Dim of Axis/Windows  ***<ddW>]^c^c^pYQ_DIM_AXISWD ^p
+   [Dim of Blks/Walls    **<ddWW>]^c^c^pYQ_DIM_BLOCKS ^p
+   [Dim of Cupboard       *<ddGZ>]^c^c^pYQ_DIM_CUPBOARD ^p
+   [--]
+   [Dim of Steps          *<ddST>]^c^c^pYQ_DIM_STAIRS ^p
+   [Dim Break at Inters. **<ddXX>]^c^c^pYQ_DIM_INTPTS ^p
+   [Dim Chord at Inters.  *<ddCC>]^c^c^pYQ_DIM_CURVEINTPTS ^p
+   [Dim Arc at Inters.    *<ddAC>]^c^c^pYQ_DIM_ARCPARTS ^p
+   [Dim Rebuild by texts  **<ddP>]^c^c^pYQ_DIM_REARRANGE ^p
+   [Dim Merge Baseline   **<ddBB>]^c^c^pYQ_DIM_MERGEBASE ^p
+   [--]
+   [Switch Dim Layer      *<ddER>]^c^c^pYQ_DIM_SWITCHLAYER ^p
+   [Set Current DimStyle ***<ddS>]^c^c^pYQ_DIM_CSTYLE ^p
+   [Dim Update by Style  ***<ddU>]^c^c^pYQ_DIM_UPDATE ^p
+   [<-Switch YQ Dimstyle   **<ddYQ>]^c^c^pYQ_DIM_SWITCHSTYLE ^p
+[->Dimension Modify]
+   [Adjust TEXT Position***<ddAA>]^c^c^pYQ_DIM_ADJUST ^p
+   [--]
+   [Extend Dim Line      ***<ddE>]^c^c^pYQ_DIM_EXTEND ^p
+   [Split/Ext into Many ****<dd2>]^c^c^pYQ_DIM_DIVIDE ^p
+   [Merge Dims          ****<dd1>]^c^c^pYQ_DIM_MERGE ^p
+   [Align Definition Pts ***<ddV>]^c^c^pYQ_DIM_ALIGN ^p
+   [Align Dims MLine    ***<ddVV>]^c^c^pYQ_DIM_ALIGNDIMLINE ^p
+   [Align Feet Points     **<ddL>]^c^c^pYQ_DIM_ALIGNPOINTS ^p
+   [Fix Extension lengths *<ddLE>]^c^c^pYQ_DIM_EXTLEN ^p
+   [Adjust Base Spacing   **<ddY>]^c^c^pYQ_DIM_ADJUSTBASE ^p
+   [Batch Base Spacing  ***<ddYY>]^c^c^pYQ_DIM_BATCHBASE ^p
+   [Show Extension Lines  *<dd2E>]^c^c^pYQ_DIM_SHOWEXTLINE ^p
+   [Aligned or Rotated    *<ddRA>]^c^c^pYQ_DIM_SWITCH_AR ^p
+   [--]
+   [Overturn Dim Text    **<ddFZ>]^c^c^pYQ_DIM_REVERSE ^p
+   [Lock the Text Content **<ddF>]^c^c^pYQ_DIM_FIX ^p
+   [Reset Default Value  **<ddRE>]^c^c^pYQ_DIM_RECOVER ^p
+   [Units to Meter        **<ddM>]^c^c^pYQ_DIM_MMTOM ^p
+   [Rounds Dim Value      **<dd0>]^c^c^pYQ_DIM_ROUND ^p
+   [New Dim Text           *<ddN>]^c^c^pYQ_DIM_NEWTEXT ^p
+   [--]
+   [Move Dim Text         **<ddT>]^c^c^pYQ_DIM_TEDIT ^p
+   [<-Reset Dim Text Home   **<ddH>]^c^c^pYQ_DIM_HOME ^p
+[--]
+[->Curve Tools]
+   [Add/Remove Vertexes  ***<xxV>]^c^c^pYQ_PLINE_VERTEXES ^p
+   [Optimize Plines      ***<xxY>]^c^c^pYQ_PLINE_OPTIMIZE ^p
+   [--]
+   [Pline Segment to Arc  **<xxA>]^c^c^pYQ_LINE2ARC ^p
+   [Pline Segment Width    *<xxW>]^c^c^pYQ_PLSEGMENT_WIDTH ^p
+   [Pline Segment Offset   *<xxS>]^c^c^pYQ_PLSEGMENT_OFFSET ^p
+   [--]
+   [Join Pline/Arc/Line ****<xxJ>]^c^c^pYQ_PLINE_JOIN ^p
+   [Close Pline/Arc/Line ***<xxC>]^c^c^pYQ_PLINE_CLOSE ^p
+   [Reverse Curve Direct.**<xxFZ>]^c^c^pYQ_PLINE_REVERSE ^p
+   [W-Pline to Wireframe  **<xxF>]^c^c^pYQ_WPLINE2WIREFRAME ^p
+   [Connect 2Pline Vertexes*<LJX>]^c^c^pYQ_CONNECTVERTEXES ^p
+   [--]
+   [Find Border/Outline   ***<lk>]^c^c^pYQ_OUTLINE ^p
+   [Find Inner Contours   **<nlk>]^c^c^pYQ_INNERCONTOURS ^p
+   [Contours + Offset    **<nlks>]^c^c^pYQ_INNEROFFSET ^p
+   [Convert to Freehand    **<hw>]^c^c^pYQ_TOFREEHAND ^p
+   [--]
+   [Break to Equal Parts  ***<DF>]^c^c^pYQ_BREAK_EQUAL ^p
+   [Divide by 2 Points    **<DFx>]^c^c^pYQ_2PTSDIVIDE ^p
+   [--]
+   [Ellipse to Arcs       **<e2a>]^c^c^pYQ_ELLIPSE2ARC ^p
+   [Curve to Arc Pline    **<cca>]^c^c^pYQ_SPLINE2APLINE ^p
+   [Curve to Line Pline   **<ccx>]^c^c^pYQ_SPLINE2XPLINE ^p
+   [Curve to Bowstrings   *<ccxx>]^c^c^pYQ_CURVE2BOWSTRING ^p
+   [<-Curve Projection       *<ccy>]^c^c^pYQ_CURVEPROJECTION ^p
+[->Extra Tools]
+   [Number Lines Manage *****<vv>]^c^c^pYQ_NUMBERLINES ^p
+   [--]
+   [Double Lines        *****<xd>]^c^c^pYQ_DOUBLELINE ^p
+   [Double Lines Scissor*****<TX>]^c^c^pYQ_TRIMDOUBLELINE ^p
+   [Double Line Thickness***<xdT>]^c^c^pYQ_DLINETHICKNESS ^p
+   [To Double Lines      ***<xxd>]^c^c^pYQ_2DOUBLELINE ^p
+   [Double lines Offset    *<xdo>]^c^c^pYQ_DLINE_OFFSET ^p
+   [Axis of Double Lines   **<ce>]^c^c^pYQ_DOUBLELINEAXIS ^p
+   [--]
+   [Objects Alignment    ****<DQ>]^c^c^pYQ_ALIGNMENT ^p
+   [Leaders Alignment   ***<aaDQ>]^c^c^pYQ_LEADERALIGN ^p
+   [Align Frame with Line *<tkTZ>]^c^c^pYQ_ALIGNFRAME ^p
+   [--]
+   [Break by a Knife      ***<bD>]^c^c^pYQ_BREAKBYKNIFE ^p
+   [Break by Knives      ***<bDD>]^c^c^pYQ_BREAKBYKNIVES ^p
+   [Break/Erase in Frames ***<bX>]^c^c^pYQ_BREAKANDERASE ^p
+   [Copy/Paste the Detail ***<QG>]^c^c^pYQ_PASTEDETAILDWG ^p
+   [--]
+   [Transform           *****<TF>]^c^c^pYQ_TRANSFORM ^p
+   [--]
+   [Bounding Box            *<JX>]^c^c^pYQ_BOUNDINGBOX ^p
+   [tO Bounding Box         *<WK>]^c^c^pYQ_TOBOUNDINGBOX ^p
+   [Minimum Bounding Box  **<xJX>]^c^c^pYQ_MINBOUNDINGBOX ^p
+   [--]
+   [Turn Objects         ****<FZ>]^c^c^pYQ_OVERTURN ^p
+   [Exchange Location       *<JH>]^c^c^pYQ_EXCHANGELOCATION ^p
+   [Copy to Points       **<DZBZ>]^c^c^pYQ_COPY2POINTS ^p
+   [<-Assistant Lines       **<FZX>]^c^c^pYQ_ASSISTANTLINES ^p
+[->Modify Plus]
+   [Scale for Each        **<aSC>]^c^c^pYQ_SCALE_EACH ^p
+   [Rotate for Each       **<aRT>]^c^c^pYQ_ROTATE_EACH ^p
+   [Mirror for Each        *<aMI>]^c^c^pYQ_MIRROR_EACH ^p
+   [XY Scale              **<scX>]^c^c^pYQ_SCALEXYZ ^p
+   [--]
+   [Dynamic Copy           **<cv>]^c^c^pYQ_DYNAMICCOPY ^p
+   [Stretch with Distance  *<STd>]^c^c^pYQ_STRETCH_D ^p
+   [Move with a Distance    *<vd>]^c^c^pYQ_MOVE_D ^p
+   [Memorial Move           *<vR>]^c^c^pYQ_MOVE_MEMORIAL ^p
+   [Memorial Copy           *<cR>]^c^c^pYQ_COPY_MEMORIAL ^p
+   [--]
+   [Super Offset           **<SF>]^c^c^pYQ_SUPEROFFSET ^p
+   [Extend to Point/Line ***<exX>]^c^c^pYQ_EXTENDTOPOINT ^p
+   [--]
+   [Link Arc/Line/Pline   ***<FF>]^c^c^pYQ_JOIN_ARCLINE ^p
+   [Connect 2 Group Lines ***<FX>]^c^c^pYQ_CONNECT2GLINES ^p
+   [--]
+   [Add/Remove Wipeout    ***<ZZ>]^c^c^pYQ_QUICKWIPEOUT ^p
+   [--]
+   [Break All Objects     ***<bA>]^c^c^pYQ_BREAKALL ^p
+   [Break and Erase Remains *<TE>]^c^c^pYQ_BREAKERASE ^p
+   [Break At A Point        *<BB>]^c^c^pYQ_BREAK_AT ^p
+   [<-Break At 2 Points       *<BF>]^c^c^pYQ_BREAK_AT2 ^p
+[->Check and Correct]
+   [Clear Z-Axis of Objs   **<Z0>]^c^c^pYQ_CLEAR_Z ^p
+   [Clear Z-Axis in Blks **<bbZ0>]^c^c^pYQ_BLOCK_Z0 ^p
+   [--]
+   [Eliminate Overlapping ***<RD>]^c^c^pYQ_REMOVE_DUPLICATE ^p
+   [Merge Overlap Lines    **<LU>]^c^c^pYQ_LINEUNION ^p
+   [Connect Lines/Arcs    ***<LX>]^c^c^pYQ_LINKLINEARC ^p
+   [Remove Pt/Short-Lines   *<LC>]^c^c^pYQ_LINECLEAN ^p
+   [Adjust Objs to Grid    **<JZ>]^c^c^pYQ_ADJUST ^p
+   [Oblique Correction    **<xgz>]^c^c^pYQ_OBLIQUE_CORRECTION ^p
+   [--]
+   [Dialog Merge         ***<xHB>]^c^c^pYQ_MERGE ^p
+   [Purge All in DWG      **<puA>]^c^c^pYQ_PURGEALL ^p
+   [Purge DWGs in Folder   *<puF>]^c^c^pYQ_PURGEFILES ^p
+   [--]
+   [Check Object's Color   *<CYS>]^c^c^pYQ_CHECKCOLOR ^p
+   [Find Non-Ortho Lines   *<BPX>]^c^c^pYQ_FINDNONORTHOLINES ^p
+   [Find Unmatch WCS Plan   *<UM>]^c^c^pYQ_UCSMATCH ^p
+   [Orthoaxis Check        *<BCZ>]^c^c^pYQ_CHECKORTHOAXIS ^p
+   [--]
+   [<-Revcloud                *<YX>]^c^c^pYQ_REVCLOUD ^p
+[--]
+[->Block and Attribute]
+   [Heap Trees             **<zw>]^c^c^pYQ_HEAPTREES ^p
+   [Landscape Analyzing  ****<hj>]^c^c^pYQ_LANDSCAPE ^p
+   [--]
+   [Change BK Layer/Color **<BB0>]^c^c^pYQ_BLOCK2BYLAYER ^p
+   [Change Base Point     **<bbI>]^c^c^pYQ_BLOCKBASEPOINT ^p
+   [Block Rename          **<bbR>]^c^c^pYQ_BLOCK2NEWNAME ^p
+   [Block Batch Rename     *<bbG>]^c^c^pYQ_BLOCK_BATCHRENAME ^p
+   [Create Detail Block   **<bbD>]^c^c^pYQ_QUICKDETAILBLOCK ^p
+   [Set Block Scale        *<bbS>]^c^c^pYQ_BLOCKSCALE ^p
+   [Write Out Blocks       *<bbW>]^c^c^pYQ_BLOCK_WRITEOUT ^p
+   [Replace by DWG       **<bbTD>]^c^c^pYQ_REPLACEBYDWG ^p
+   [--]
+   [Create Block Quickly  **<BBn>]^c^c^pYQ_QUICKNEWBLOCK ^p
+   [Append to a Block      *<bbA>]^c^c^pYQ_BLOCK_ADD ^p
+   [Erase Object of Block  *<bbE>]^c^c^pYQ_BLOCK_REMOVE ^p
+   [Copy Objs from a Block *<bbC>]^c^c^pYQ_BLOCK_COPY ^p
+   [Add/Del Block Wipeout**<bbZZ>]^c^c^pYQ_BLOCKWIPEOUT ^p
+   [--]
+   [Create Minsert Block  *<BBjm>]^c^c^pYQ_CREATE_MINSERT ^p
+   [Explode Minsert Blocks *<BBx>]^c^c^pYQ_EXPLODE_MINSERT ^p
+   [Explode Nest Blocks  **<bbXX>]^c^c^pYQ_EXPLODE_NBLOCK ^p
+   [--]
+   [Block Text to Attr   **<bbsx>]^c^c^pYQ_BLOCKTEXT2ATT ^p
+   [Modify Attributes    ***<sxG>]^c^c^pYQ_MODIFY_ATT ^p
+   [Increase Attributes  ***<sxZ>]^c^c^pYQ_INCREASE_ATT ^p
+   [Change Attributes    ***<sxC>]^c^c^pYQ_CHANGEATTS ^p
+   [Change Attr to Text   **<sxT>]^c^c^pYQ_BLOCKATT2TEXT ^p
+   [Erase Attr in Block    *<sxE>]^c^c^pYQ_ERASE_BLKATT ^p
+   [--]
+   [YQ Block Library    *****<KK>]^c^c^pYQ_BLOCKS ^p
+   [User Block Library  *****<BV>]^c^c^pYQ_BLOCKVIEWER ^p
+   [User Block Library1  ***<BV1>]^c^c^pYQ_BLOCKVIEWER1 ^p
+   [User Block Library2  ***<BV2>]^c^c^pYQ_BLOCKVIEWER2 ^p
+   [<-User Block Library3  ***<BV3>]^c^c^pYQ_BLOCKVIEWER3 ^p
+[->Hatching & Linetype]
+   [Hatching Shortcuts   **<hhSC>]^c^c^pYQ_HATCHKEYS ^p
+   [Change Hatching&Scale***<xtc>]^c^c^pYQ_HATCHINGSCALE ^p
+   [Quick Hatching       ****<TC>]^c^c^pYQ_HATCH_QUICK ^p
+   [Hatching by Template ***<TCT>]^c^c^pYQ_HATCH_MATCH ^p
+   [Param./Slide Hatch *****<TCC>]^c^c^pYQ_HATCH_SLIDE ^p
+   [--]
+   [Set Hatch Base Point  **<hhI>]^c^c^pYQ_HATCH_NEWBASE ^p
+   [Hatching Angle        **<hhA>]^c^c^pYQ_HATCH_ANGLE ^p
+   [Hatching Border        *<hhB>]^c^c^pYQ_HATCH_BORDER ^p
+   [Hatching Clipping      *<hhJ>]^c^c^pYQ_HATCH_CLIPPING ^p
+   [Split Hatching         *<hhX>]^c^c^pYQ_HATCH_SPLIT ^p
+   [Hatching Union         *<hhU>]^c^c^pYQ_HATCH_UNION ^p
+   [Hatching Disassociate *<hhGL>]^c^c^pYQ_HATCH_DISASSO ^p
+   [--]
+   [Fill in Walls/Columns **<wwF>]^c^c^pYQ_FILL_WALL ^p
+   [--]
+   [Make Hatch .pat 1mm  ****<MP>]^c^c^pYQ_MKPAT ^p
+   [Make Hatch .pat 1:1 ****<MP1>]^c^c^pYQ_MKPAT1 ^p
+   [Make .pat by Hatch   ***<MPP>]^c^c^pYQ_MKPAT_BYHATCH ^p
+   [--]
+   [Linetype Shortcuts   **<ltSC>]^c^c^pYQ_LTYPEKEYS ^p
+   [Change Linetype&Scale ***<xt>]^c^c^pYQ_LTSCALE ^p
+   [Linetype Switch       **<xtS>]^c^c^pYQ_LTSWITCH ^p
+   [Replace LT Scale     **<pLTS>]^c^c^pYQ_PUTLTSCALE ^p
+   [Make Letter Linetype ***<MLT>]^c^c^pYQ_MKLINETYPE ^p
+   [<-Load Linetypes        **<lLT>]^c^c^pYQ_LOADLINETYPE ^p
+[->Layer Tools]
+   [Change to Current Lay.**<erC>]^c^c^pYQ_LAYER_2CURRENT ^p
+   [Make a New Layer      **<erN>]^c^c^pYQ_LAYER_NEW ^p
+   [Set Current Layer    ***<erS>]^c^c^pYQ_LAYER_CURRENT ^p
+   [Save/Restore layers    *<erR>]^c^c^pYQ_LAYER_SAVERESTORE ^p
+   [--]
+   [Isolate Layers       ***<erD>]^c^c^pYQ_LAYER_ISO ^p
+   [Turn Off Layers      ***<erF>]^c^c^pYQ_LAYER_OFF ^p
+   [Turn Off All Layers ***<erAF>]^c^c^pYQ_LAYER_OFF_ALL ^p
+   [Turn On Layers       ***<erA>]^c^c^pYQ_LAYER_ON ^p
+   [Turn On All Layers  ***<erAA>]^c^c^pYQ_LAYER_ON_ALL ^p
+   [All Layers On/Off      *<erV>]^c^c^pYQ_LAYER_ON2OFF ^p
+   [--]
+   [Lock Layers            *<erL>]^c^c^pYQ_LAYER_LOCK ^p
+   [Isolate & Lock       **<erDL>]^c^c^pYQ_LAYER_ISO_LOCK ^p
+   [Unlock Layers          *<erU>]^c^c^pYQ_LAYER_UNLOCK ^p
+   [--]
+   [Freeze Layers          *<erZ>]^c^c^pYQ_LAYER_FREEZE ^p
+   [Isolate & Freeze      *<erDZ>]^c^c^pYQ_LAYER_ISO_FREEZE ^p
+   [Thaw out Layers        *<erT>]^c^c^pYQ_LAYER_THAW ^p
+   [--]
+   [Turn Off in Block     *<erBF>]^c^c^pYQ_LAYER_NOFF ^p
+   [Freeze in Block       *<erBZ>]^c^c^pYQ_LAYER_NFREEZE ^p
+   [Thaw/Unlock/Open All  *<erER>]^c^c^pYQ_LAYER_SHOWALL ^p
+   [--]
+   [Batch Replace Layers **<erTD>]^c^c^pYQ_LAYER_REPLACE ^p
+   [Layers Batch Rename    *<erG>]^c^c^pYQ_LAYER_BATCHRENAME ^p
+   [Merge Layers          **<erM>]^c^c^pYQ_MERGE_LAYER ^p
+   [Form Layers by Color  *<c2er>]^c^c^pYQ_FORMLAYBYCOLOR ^p
+   [Layer Shortcuts      **<erSC>]^c^c^pYQ_LAYERKEYS ^p
+   [Color Shortcuts        *<erK>]^c^c^pYQ_COLORKEYS ^p
+   [--]
+   [Output Layer Text File *<erO>]^c^c^pYQ_OUTPUTLAYERS ^p
+   [<-Input Layer Text File  *<erI>]^c^c^pYQ_INPUTLAYERS ^p
+[->Viewport/Layout Tools]
+   [Vport Layer Manager  ***<vvC>]^c^c^pYQ_VPLAYER_MANAGER ^p
+   [Freeze Viewport Layers *<vvZ>]^c^c^pYQ_VPLAYER_FREEZE ^p
+   [Freeze Block VP Layer *<vvBZ>]^c^c^pYQ_VPLAYER_NFREEZE ^p
+   [Thaw out VPort Layers  *<vvT>]^c^c^pYQ_VPLAYER_THAW ^p
+   [Isolate VP's Layers  **<vvDZ>]^c^c^pYQ_VPLAYER_ISO ^p
+   [Isolate Other VPLayers*<vvZZ>]^c^c^pYQ_VPLAYER_ISOALL ^p
+   [Grayed VP Layers       *<vvH>]^c^c^pYQ_VPLAYER_GRAY ^p
+   [Recover VP Layer Color*<vvHF>]^c^c^pYQ_VPLAYER_RECOVER ^p
+   [--]
+   [New Viewport           *<vvN>]^c^c^pYQ_VIEWPORT_NEW ^p
+   [Viewport Split        **<vv2>]^c^c^pYQ_VIEWPORT_SPLIT ^p
+   [Viewport from Model Sp.*<mVV>]^c^c^pYQ_MODEL2VIEWPORT ^p
+   [Curve to Viewport     *<xxVV>]^c^c^pYQ_CURVE2VIEWPORT ^p
+   [Set Viewport Scale    **<vvS>]^c^c^pYQ_VIEWPORT_SCALE ^p
+   [Scale Viewports      **<vvSC>]^c^c^pYQ_SCALEVPS ^p
+   [VP's Content Sync   ***<vvDQ>]^c^c^pYQ_VIEWPORT_SYNC ^p
+   [Viewport Pan           *<vvP>]^c^c^pYQ_VIEWPORT_PAN ^p
+   [--]
+   [Lock Viewports         *<vvL>]^c^c^pYQ_VIEWPORT_LOCK ^p
+   [Lock All Viewports    *<vvAL>]^c^c^pYQ_VIEWPORT_LOCK_ALL ^p
+   [Unlock Viewports       *<vvU>]^c^c^pYQ_VIEWPORT_UNLOCK ^p
+   [Unlock All Viewports  *<vvAU>]^c^c^pYQ_VIEWPORT_UNLOCK_ALL ^p
+   [--]
+   [Turn Off Viewports     *<vvF>]^c^c^pYQ_VIEWPORT_OFF ^p
+   [Turn Off All Viewports*<vvAF>]^c^c^pYQ_VIEWPORT_OFF_ALL ^p
+   [Turn On Viewports      *<vvA>]^c^c^pYQ_VIEWPORT_ON ^p
+   [Turn On All Viewports *<vvAA>]^c^c^pYQ_VIEWPORT_ON_ALL ^p
+   [--]
+   [Copy to Paper Space  **<vvBB>]^c^c^pYQ_VIEWPORT2PSPACE ^p
+   [--]
+   [Rename Layouts         *<tzG>]^c^c^pYQ_LAYOUT_BATCHRENAME ^p
+   [Frames to Layouts      *<tzF>]^c^c^pYQ_FRAMES2LAYOUTS ^p
+   [Frame Range Divideds  *<tzFG>]^c^c^pYQ_FRAMEDIVIDED ^p
+   [--]
+   [Elevation 4 UCS dir.   *<vvD>]^c^c^pYQ_UCSDIR ^p
+   [Snapshot of a View      *<KZ>]^c^c^pYQ_SNAPSHOT ^p
+   [<-Hyperlink & Views    ***<CLJ>]^c^c^pYQ_HYPERLINK ^p
+[--]
+[->Matching Brush]
+   [Match/Replace Block ****<ssB>]^c^c^pYQ_MATCH_BLOCK ^p
+   [Match Dynamic Props    *<ssD>]^c^c^pYQ_MATCH_DYNPROPS ^p
+   [Match Rotation Angle  **<ssA>]^c^c^pYQ_MATCH_ROTATION ^p
+   [--]
+   [Match Layer         ***<ssER>]^c^c^pYQ_MATCH_LAYER ^p
+   [Match Color            *<ssC>]^c^c^pYQ_MATCH_COLOR ^p
+   [Match Layer and Color *<ssCC>]^c^c^pYQ_MATCH_LAYERCOLOR ^p
+   [Match Viewport Layers *<ssVV>]^c^c^pYQ_MATCH_VPLAYER ^p
+   [--]
+   [Match Text Content   ***<ssT>]^c^c^pYQ_MATCH_CONTENT ^p
+   [Match Text Style      *<ssST>]^c^c^pYQ_MATCH_STYLE ^p
+   [Match Text Height      *<ssH>]^c^c^pYQ_MATCH_TEXTHEIGHT ^p
+   [Match Text by Att. Tag *<ssQ>]^c^c^pYQ_MATCH_TAGTEXT ^p
+   [--]
+   [Match Width of Pline ***<ssW>]^c^c^pYQ_MATCH_WIDTH ^p
+   [Match LineTyple       *<ssXT>]^c^c^pYQ_MATCH_LINETYPE ^p
+   [<-Match Thickness       *<ssTH>]^c^c^pYQ_MATCH_THICKNESS ^p
+[->Other Tools]
+   [Batch-Plot          ****<bPT>]^c^c^pYQ_BATCHPLOT ^p
+   [--]
+   [Drawing Catalog    ****<dwgL>]^c^c^pYQ_CATALOG ^p
+   [Output DWGs Batches  **<dwgS>]^c^c^pYQ_OUTPUTDWGS ^p
+   [Arrange Frames/DWGs  **<dwgA>]^c^c^pYQ_ARRANGEDWGS ^p
+   [--]
+   [Hide Entities        ***<eeF>]^c^c^pYQ_HIDESELECT ^p
+   [Hide Unselected Ent. ***<eeD>]^c^c^pYQ_HIDEUNSELECT ^p
+   [Display Temp. Hidden ***<eeA>]^c^c^pYQ_DISPLAYHIDE ^p
+   [Display All Entities **<eeAA>]^c^c^pYQ_DISPLAYALL ^p
+   [--]
+   [Create a Group        **<ggN>]^c^c^pYQ_QUICKGROUP ^p
+   [Explodes a Group      **<ggX>]^c^c^pYQ_EXPLODEGROUP ^p
+   [Append to a Group      *<ggA>]^c^c^pYQ_GROUP_ADD ^p
+   [Erase from a Group     *<ggE>]^c^c^pYQ_GROUP_REMOVE ^p
+   [Separate from a Group  *<ggS>]^c^c^pYQ_GROUP_SEPARATE ^p
+   [Purge Groups           *<ggP>]^c^c^pYQ_PURGEGROUP ^p
+   [--]
+   [Switch YQArch Dynamic *<dtYQ>]^c^c^pYQ_SWITCH_DYNAMIC ^p
+   [Excel Clipboard Points *<ZTB>]^c^c^pYQ_DRAWCLIPBOARD ^p
+   [To Google Earth    *****<a2k>]^c^c^pYQ_ACAD2KML ^P
+   [--]
+   [YQArch Command Finder  *<zml>]^c^c^pYQ_COMMANDFINDER ^P
+   [<-Last YQArch Command     *<qq>]^c^c^pYQ_LASTYQCMD ^P
+
+
+
+
+
+
+
+
+
+
+
+
+
+***TOOLBARS
+
+**SystemSetup
+ID_tbSystemSetup        [_Toolbar("Ô´Èª.ÏµÍ³Éè¶¨", _right, _show, 1, 1, 1)]
+ID_tbyq_sys_setting     [_Button("ÓÃ»§ÏµÍ³ÅäÖÃ", yq_yqsys, yq_yqsys)]^c^c^pYQ_SYS_SETTING ^P
+ID_tbyq_toolbarson      [_Button("´ò¿ªÔ´ÈªÍ¼ÐÎ°´Å¥", yq_tba, yq_tba)]^c^c^pYQ_TOOLBARSON ^P
+ID_tbyq_toolbarsoff     [_Button("¹Ø±ÕÔ´ÈªÍ¼ÐÎ°´Å¥", yq_tbaf, yq_tbaf)]^c^c^pYQ_TOOLBARSOFF ^P
+[--]
+ID_tbyq_setuser         [_Button("Ñ¡Ôñµ±Ç°ÓÃ»§", yq_yquser, yq_yquser)]^c^c^pYQ_SETUSER ^P
+ID_tbyq_lang            [_Button("ÇÐ»»ÌáÊ¾ÓïÑÔ", yq_yqlang, yq_yqlang)]^c^c^pYQ_LANG ^P
+ID_tbyq_setunits        [_Button("Éè¶¨»æÍ¼µ¥Î»", yq_yqunits, yq_yqunits)]^c^c^pYQ_SETUNITS ^P
+ID_tbyq_menu            [_Button("¼ÓÔØÔ´Èª²Ëµ¥", yq_yqmenu, yq_yqmenu)]^c^c^pYQ_MENU ^P
+[--]
+ID_tbyq_setdwgscale     [_Button("ÉèÖÃÍ¼Ö½/·ûºÅ±ÈÀý", yq_sd, yq_sd)]^c^c^pYQ_SETDWGSCALE ^P
+ID_tbyq_dwgframe        [_Button("»æÖÆÍ¼¿ò", yq_tk, yq_tk)]^c^c^pYQ_DWGFRAME ^p
+[--]
+ID_tbyq_help            [_Button("ÏêÏ¸°ïÖúÎÄµµ", yq_yqhelp, yq_yqhelp)]^c^c^pYQ_HELP ^P
+ID_tbyq_ver             [_Button("Ô´ÈªÉè¼Æ°æ±¾", yq_yqver, yq_yqver)]^c^c^pYQ_VER ^P
+ID_tbyq_website         [_Button("Ô´ÈªÉè¼ÆÍøÕ¾", yq_yqweb, yq_yqweb)]^c^c^pYQ_WEBSITE ^P
+ID_tbyq_about           [_Button("¹ØÓÚÔ´ÈªÉè¼Æ", yq_yqabout, yq_yqabout)]^c^c^pYQ_ABOUT ^p
+
+**WallColTools
+ID_tbWallColTools       [_Toolbar("Ô´Èª.Æ½ÃæÇ½Öù", _right, _show, 1, 2, 1)]
+ID_tbyq_axisline        [_Button("»­ÖáÏß", yq_ax, yq_ax)]^c^c^pYQ_AXISLINE ^p
+ID_tbyq_gridaxis        [_Button("¼òµ¥ÖáÏßÍø", yq_zxw, yq_zxw)]^c^c^pYQ_GRIDAXIS ^p
+[--]
+ID_tbyq_wall            [_Button("»­Ç½", yq_ww, yq_ww)]^c^c^pYQ_WALL ^p
+ID_tbyq_trim_fix_wall   [_Button("ÖÇÄÜÇ½¼ô", yq_tw, yq_tw)]^c^c^pYQ_TRIM_FIX_WALL ^p
+ID_tbyq_wall_chgthk     [_Button("ÐÞÕýÇ½ºñ", yq_wwt, yq_wwt)]^c^c^pYQ_WALL_CHGTHK ^p
+ID_tbyq_line2wall       [_Button("ÖáÏß±äÇ½", yq_xww, yq_xww)]^c^c^pYQ_LINE2WALL ^p
+ID_tbyq_wall_cdoffset   [_Button("Ç½¾»¾àÆ«ÒÆ", yq_wwo, yq_wwo)]^c^c^pYQ_WALL_CDOFFSET ^p
+[--]
+ID_tbyq_wall2axis       [_Button("ÇóÇ½ÖÐÖáÏß", yq_wwa, yq_wwa)]^c^c^pYQ_WALL2AXIS ^p
+ID_tbyq_fill_wall       [_Button("Ìî³äÇ½¡¢Öù", yq_wwf, yq_wwf)]^c^c^pYQ_FILL_WALL ^p
+[--]
+ID_tbyq_r_column        [_Button("»­·½Öù×Ó", yq_zzr, yq_zzr)]^c^c^pYQ_R_COLUMN ^p
+ID_tbyq_o_column        [_Button("»­Ô²Öù×Ó", yq_zzc, yq_zzc)]^c^c^pYQ_O_COLUMN ^p
+ID_tbyq_l_column        [_Button("»­LÐÍÖù×Ó", yq_zzl, yq_zzl)]^c^c^pYQ_L_COLUMN ^p
+ID_tbyq_t_column        [_Button("»­TÐÍÖù×Ó", yq_zzt, yq_zzt)]^c^c^pYQ_T_COLUMN ^p
+ID_tbyq_c_column        [_Button("»­+ÐÍÖù×Ó", yq_zzx, yq_zzx)]^c^c^pYQ_C_COLUMN ^p
+[--]
+ID_tbyq_axis_column     [_Button("ÖáÏß²¼ÖÃÖù×Ó", yq_zzbz, yq_zzbz)]^c^c^pYQ_AXIS_COLUMN ^p
+ID_tbyq_pline2column    [_Button("±ä³ÉÖù×Ó", yq_xxzz, yq_xxzz)]^c^c^pYQ_PLINE2COLUMN ^p
+ID_tbyq_fill_column     [_Button("Ìî³äÖù×Ó", yq_zzf, yq_zzf)]^c^c^pYQ_FILL_COLUMN ^p
+[--]
+ID_tbyq_erase_wall      [_Button("É¾Ç½ÖùÃÅ´°", yq_ew, yq_ew)]^c^c^pYQ_ERASE_WALL ^p
+
+**WindowDoorTools
+ID_tbWindowDoorTools    [_Toolbar("Ô´Èª.Æ½ÃæÃÅ´°", _right, _show, 2, 1, 1)]
+ID_tbyq_hole_door       [_Button("Ç½»òÖáÏß¿ªÆÕÍ¨ÃÅ", yq_ad, yq_ad)]^c^c^pYQ_HOLE_DOOR ^p
+ID_tbyq_door            [_Button("Á½µã»­ÆÕÍ¨ÃÅ", yq_ad2, yq_ad2)]^c^c^pYQ_DOOR ^p
+ID_tbyq_hole_win        [_Button("Ç½»òÖáÏß¿ªÆÕÍ¨´°", yq_wd, yq_wd)]^c^c^pYQ_HOLE_WIN ^p
+ID_tbyq_win             [_Button("Á½µã»­ÆÕÍ¨´°", yq_wd2, yq_wd2)]^c^c^pYQ_WIN ^p
+ID_tbyq_windoor_replace [_Button("ÆÕÍ¨ÃÅ´°ÖÃ»»", yq_td, yq_td)]^c^c^pYQ_WINDOOR_REPLACE ^p
+ID_tbyq_hole            [_Button("Ç½ÉÏ¿ªÃÅ¶´", yq_ho, yq_ho)]^c^c^pYQ_HOLE ^p
+[--]
+ID_tbyq_hole_pocketdoor       [_Button("Ç½»òÖáÏß¿ªÃÅÌ×ÃÅ", yq_adt, yq_adt)]^c^c^pYQ_HOLE_POCKETDOOR ^p
+ID_tbyq_pocketdoor            [_Button("Á½µã»­ÃÅÌ×ÃÅ", yq_adt2, yq_adt2)]^c^c^pYQ_POCKETDOOR ^p
+ID_tbyq_pocketdoor_replace    [_Button("Ìæ´úÎªÃÅÌ×ÃÅ", yq_tdd, yq_tdd)]^c^c^pYQ_POCKETDOOR_REPLACE ^p
+[--]
+ID_tbyq_hole_window     [_Button("Ç½»òÖáÏß¿ª²ÎÊý´°", yq_wd, yq_wd)]^c^c^pYQ_HOLE_WINDOW ^p
+ID_tbyq_window          [_Button("Á½µã»­²ÎÊý´°", yq_wd2, yq_wd2)]^c^c^pYQ_WINDOW ^p
+ID_tbyq_window_replace  [_Button("Ìæ´úÎª²ÎÊý´°", yq_tdw, yq_tdw)]^c^c^pYQ_WINDOW_REPLACE ^p
+[--]
+ID_tbyq_hole_cornerwindow  [_Button("Ç½ÉÏ¿ª×ª½Ç´°", yq_wdz, yq_wdz)]^c^c^pYQ_HOLE_CORNERWINDOW ^p
+ID_tbyq_cwindow_replace    [_Button("×ª½Ç´°Ìæ»»ÑùÊ½", yq_tdz, yq_tdz)]^c^c^pYQ_CWINDOW_REPLACE ^p
+[--]
+ID_tbyq_doorsill        [_Button("ÃÅ¼÷Ïß¹ÜÀí", yq_mkx, yq_mkx)]^c^c^pYQ_DOORSILL ^p
+ID_tbyq_dooropening     [_Button("ÃÅ¶´Ïß¹ÜÀí", yq_mdx, yq_mdx)]^c^c^pYQ_DOOROPENING ^p
+[--]
+ID_tbyq_line2window     [_Button("Ïß±äÆ½Ãæ´°", yq_xwd, yq_xwd)]^c^c^pYQ_LINE2WINDOW ^p
+ID_tbyq_width_windoor   [_Button("ÐÞ¸ÄÃÅ´°¿í¶È", yq_cw, yq_cw)]^c^c^pYQ_WIDTH_WINDOOR ^p
+ID_tbyq_move_windoor    [_Button("×óÓÒÒÆ¶¯ÃÅ´°", yq_vw, yq_vw)]^c^c^pYQ_MOVE_WINDOOR ^p
+[--]
+ID_tbyq_repair          [_Button("ÐÞÕýÃÅ´°ºÍÖù×Ó", yq_fw, yq_fw)]^c^c^pYQ_REPAIR ^p
+ID_tbyq_moveandfix      [_Button("ÒÆ¶¯²¢ÐÞÕý", yq_vx, yq_vx)]^c^c^pYQ_MOVEANDFIX ^p
+ID_tbyq_copyandfix      [_Button("¸´ÖÆ²¢ÐÞÕý", yq_cx, yq_cx)]^c^c^pYQ_COPYANDFIX ^p
+ID_tbyq_mirrorandfix    [_Button("¾µÏñ²¢ÐÞÕý", yq_rrx, yq_rrx)]^c^c^pYQ_MIRRORANDFIX ^p
+[--]
+ID_tbyq_overturn        [_Button("·­×ªÃÅ´°", yq_fz, yq_fz)]^c^c^pYQ_OVERTURN ^p
+ID_tbyq_match_block     [_Button("Æ¥ÅäÃÅ´°", yq_ssb, yq_ssb)]^c^c^pYQ_MATCH_BLOCK ^p
+[--]
+ID_tbyq_erase_wall      [_Button("É¾Ç½ÖùÃÅ´°", yq_ew, yq_ew)]^c^c^pYQ_ERASE_WALL ^p
+[--]
+ID_tbyq_winSerialNumber [_Button("ÃÅ´°±àºÅ¹ÜÀí", yq_wbh, yq_wbh)]^c^c^pYQ_WINSERIALNUMBER ^p
+
+**Components
+ID_tbComponents         [_Toolbar("Ô´Èª.½¨Öþ¹¹¼þ", _right, _show, 2, 2, 1)]
+ID_tbyq_sldcomponents   [_Button("½¨Öþ¹¹¼þ¼¯", yq_gj, yq_gj)]^c^c^pYQ_SLDCOMPONENTS ^p
+[--]
+ID_tbyq_escalator       [_Button("×Ô¶¯·öÌÝÆ½ÃæÁ¢Ãæ", yq_ltf, yq_ltf)]^c^c^pYQ_ESCALATOR ^p
+ID_tbyq_staircase_plan  [_Button("¾ØÐÎÂ¥ÌÝ¼äÆ½Ãæ", yq_ltj, yq_ltj)]^c^c^pYQ_STAIRCASE_PLAN ^p
+ID_tbyq_arcstair_plan   [_Button("»¡ÐÎÂ¥ÌÝÆ½Ãæ", yq_lta, yq_lta)]^c^c^pYQ_ARCSTAIR_PLAN ^p
+ID_tbyq_lift_plan       [_Button("µçÌÝ½ÎÏáÆ½Ãæ", yq_dtj, yq_dtj)]^c^c^pYQ_LIFT_PLAN ^p
+[--]
+ID_tbyq_door_elevation      [_Button("Æ½¿ªÃÅÁ¢Ãæ", yq_ade, yq_ade)]^c^c^pYQ_DOOR_ELEVATION ^p
+ID_tbyq_door_section        [_Button("Æ½¿ªÃÅÆÊÃæ", yq_ads, yq_ads)]^c^c^pYQ_DOOR_SECTION ^p
+ID_tbyq_baywin_section      [_Button("»æÖÆÍ¹´°ÆÊÃæ", yq_wts, yq_wts)]^c^c^pYQ_BAYWIN_SECTION ^p
+ID_tbyq_window_elevation    [_Button("´°»§Á¢Ãæ", yq_wde, yq_wde)]^c^c^pYQ_WINDOW_ELEVATION ^p
+ID_tbyq_window_section      [_Button("´°»§ÆÊÃæ", yq_wds, yq_wds)]^c^c^pYQ_WINDOW_SECTION ^p
+ID_tbyq_shutter             [_Button("°ÙÒ¶´°Á¢ÃæÆÊÃæ", yq_by, yq_by)]^c^c^pYQ_SHUTTER ^p
+ID_tbyq_curtainglass        [_Button("Ä»Ç½²£Á§ÆÊÃæ", yq_mbl, yq_mbl)]^c^c^pYQ_CURTAINGLASS ^p
+[--]
+ID_tbyq_lines2winelev       [_Button("Ïß¿ò±ä´°»§Á¢Ãæ", yq_wdd, yq_wdd)]^c^c^pYQ_LINES2WINELEV ^p
+ID_tbyq_sn2winelev          [_Button("ÃÅ´°±àºÅ±äÁ¢Ãæ¿ò", yq_t2w, yq_t2w)]^c^c^pYQ_SN2WINELEV ^p
+ID_tbyq_curtainwall         [_Button("Ä»Ç½Á¢Ãæ", yq_mq, yq_mq)]^c^c^pYQ_CURTAINWALL ^p
+ID_tbyq_glass_partition     [_Button("Ä»/¸ôÇ½ÆÊÃæ", yq_mqs, yq_mqs)]^c^c^pYQ_GLASS_PARTITION ^p
+ID_tbyq_banister            [_Button("·öÊÖÀ¸¸ËÁ¢Ãæ", yq_lg, yq_lg)]^c^c^pYQ_BANISTER ^p
+[--]
+ID_tbyq_staircase_section   [_Button("Â¥ÌÝ¼äÆÊÃæ", yq_ltp, yq_ltp)]^c^c^pYQ_STAIRCASE_SECTION ^p
+ID_tbyq_step_section        [_Button("À­ÏßÌ¤²½", yq_lxtb, yq_lxtb)]^c^c^pYQ_STEP_SECTION ^p
+[--]
+ID_tbyq_waterproof      [_Button("»æÖÆ·ÀË®²ãÆÊÃæ", yq_fsc, yq_fsc)]^c^c^pYQ_WATERPROOF ^p
+ID_tbyq_stucco          [_Button("»æÖÆ·ÛË¢²ãÆÊÃæ", yq_fn, yq_fn)]^c^c^pYQ_STUCCO ^p
+
+**Decoration
+ID_tbdecoration         [_Toolbar("Ô´Èª.×°ÊÎ¹¹¼þ", _right, _show, 2, 3, 1)]
+ID_tbyq_slddecoration   [_Button("×°ÊÎ¹¹¼þ¼¯", yq_zs, yq_zs)]^c^c^pYQ_SLDDECORATION ^p
+[--]
+ID_tbyq_autofurniture   [_Button("¼Ò¾ß½à¾ßÆ½Ãæ²¼ÖÃ", yq_jj, yq_jj)]^c^c^pYQ_AUTOFURNITURE ^p
+ID_tbyq_arrangewc       [_Button("²ÞËùÔ¡ÊÒÆ½Ãæ²¼ÖÃ", yq_wc, yq_wc)]^c^c^pYQ_ARRANGEWC ^p
+[--]
+ID_tbyq_chestplan       [_Button("ÒÂ¹ñÆ½Ãæ", yq_yg, yq_yg)]^c^c^pYQ_CHESTPLAN ^p
+ID_tbyq_curtainplan     [_Button("´°Á±Æ½Ãæ", yq_cl, yq_cl)]^c^c^pYQ_CURTAINPLAN ^p
+ID_tbyq_plasterstringplan     [_Button("Æ«ÒÆÊ¯¸àÏßÆ½Ãæ", yq_sgx, yq_sgx)]^c^c^pYQ_PLASTERSTRINGPLAN ^p
+ID_tbyq_cupboardplan    [_Button("¼òÒ×¹ñ×ÓÆ½Ãæ", yq_gz, yq_gz)]^c^c^pYQ_CUPBOARDPLAN ^p
+ID_tbyq_cupboardelev    [_Button("¼òÒ×¹ñ×ÓÁ¢Ãæ", yq_gze, yq_gze)]^c^c^pYQ_CUPBOARDELEV ^p
+[--]
+ID_tbyq_stonetile       [_Button("Ê¯Í·°å¼°ÆÊÃæ", yq_stb, yq_stb)]^c^c^pYQ_STONETILE ^p
+ID_tbyq_woodenframe     [_Button("Ä¾·½¼Ü×ÓÆÊÃæ", yq_mf, yq_mf)]^c^c^pYQ_WOODENFRAME ^p
+ID_tbyq_array_boards    [_Button("²ã°åÕóÁÐ", yq_cbz, yq_cbz)]^c^c^pYQ_ARRAY_BOARDS ^p
+[--]
+ID_tbyq_blockboard      [_Button("Ä¾¹¤°åÆÊÃæ", yq_mgb, yq_mgb)]^c^c^pYQ_BLOCKBOARD ^p
+ID_tbyq_plywood         [_Button("¼Ð°åÆÊÃæ", yq_jb, yq_jb)]^c^c^pYQ_PLYWOOD ^p
+ID_tbyq_woodflooring    [_Button("Ä¾µØ°åÆÊÃæ", yq_mdb, yq_mdb)]^c^c^pYQ_WOODFLOORING ^p
+ID_tbyq_glass           [_Button("²£Á§ÆÊÃæ", yq_bl, yq_bl)]^c^c^pYQ_GLASS ^p
+ID_tbyq_gypsumboard     [_Button("Ê¯¸à°åÆÊÃæ", yq_sgb, yq_sgb)]^c^c^pYQ_GYPSUMBOARD ^p
+ID_tbyq_yq_lighttrough  [_Button("°µ²ØµÆ²ÛÆÊÃæ", yq_thdc, yq_thdc)]^c^c^pYQ_LIGHTTROUGH ^p
+ID_tbyq_partitionwall   [_Button("Çá¸ÖÁú¹ÇÊ¯¸à°å¸ôÇ½", yq_gq, yq_gq)]^c^c^pYQ_PARTITIONWALL ^p
+[--]
+ID_tbyq_formedsteel     [_Button("ÐÍ¸Ö½ØÃæ", yq_xg, yq_xg)]^c^c^pYQ_FORMEDSTEEL ^p
+ID_tbyq_ironframe       [_Button("½Ç¸Ö¼Ü×ÓÆÊÃæ", yq_jgj, yq_jgj)]^c^c^pYQ_IRONFRAME ^p
+[--]
+ID_tbyq_insulation      [_Button("±£ÎÂÃÞÆÊÃæ", yq_bwm, yq_bwm)]^c^c^pYQ_INSULATION ^p
+ID_tbyq_weldingline     [_Button("»æÖÆº¸·ì", yq_hf, yq_hf)]^c^c^pYQ_WELDINGLINE ^p
+ID_tbyq_hose            [_Button("»æÖÆÈí¹Ü", yq_rg, yq_rg)]^c^c^pYQ_HOSE ^p
+ID_tbyq_pipe            [_Button("»æÖÆ¹ÜÏß", yq_gx, yq_gx)]^c^c^pYQ_PIPE ^p
+[--]
+ID_tbyq_boardhole       [_Button("°åÉÏ·½¿×¶´", yq_kd, yq_kd)]^c^c^pYQ_BOARDHOLE ^p
+ID_tbyq_cylindershadow  [_Button("Ô²ÖùÓ°Ïß", yq_yzx, yq_yzx)]^c^c^pYQ_CYLINDERSHADOW ^p
+ID_tbyq_cylindershadow  [_Button("»­±³Ë¨¿×", yq_bsk, yq_bsk)]^c^c^pYQ_BACKBOLTHOLE ^p
+[--]
+ID_tbyq_autolamps       [_Button("Æ½ÃæµÆ¾ß²¼ÖÃ", yq_dj, yq_dj)]^c^c^pYQ_AUTOLAMPS ^p
+ID_tbyq_randomspread    [_Button("ÂúÌìÐÇËæ»úÆÌÂú", yq_mtx, yq_mtx)]^c^c^pYQ_RANDOMSPREAD ^p
+ID_tbyq_indoorelev      [_Button("Éú³ÉÊÒÄÚÁ¢Ãæ¿ò¼Ü", yq_lm, yq_lm)]^c^c^pYQ_INDOORELEV ^p
+
+**Symbols
+ID_tbSymbols            [_Toolbar("Ô´Èª.½¨Öþ·ûºÅ", _right, _show, 2, 4, 1)]
+ID_tbyq_sldsymbols      [_Button("½¨Öþ·ûºÅ¼¯", yq_fh, yq_fh)]^c^c^pYQ_SLDSYMBOLS ^p
+[--]
+ID_tbyq_auto_axis_dim   [_Button("×Ô¶¯ÖáºÅ³ß´çÏß", yq_azh, yq_azh)]^c^c^pYQ_AUTO_AXIS_DIM ^p
+ID_tbyq_symbol_axis_c   [_Button("Á¬ÐøÖáºÅ³ß´çÏß", yq_zh, yq_zh)]^c^c^pYQ_SYMBOL_AXIS_C ^p
+[--]
+ID_tbyq_geodesic_coordinates [_Button("½¨Öþ×ø±ê", yq_zb, yq_zb)]^c^c^pYQ_GEODESIC_COORDINATES ^p
+ID_tbyq_designed_elevation   [_Button("½¨Öþ±ê¸ß", yq_bg, yq_bg)]^c^c^pYQ_DESIGNED_ELEVATION ^p
+ID_tbyq_contour_elevation    [_Button("ÈýÎ¬µÈ¸ßÏß±ê¸ß", yq_xbg, yq_xbg)]^c^c^pYQ_CONTOUR_ELEVATION ^p
+[--]
+ID_tbyq_symbol_sectionplane  [_Button("Æ½ÃæÆÊÇÐ·ûºÅ", yq_pqf, yq_pqf)]^c^c^pYQ_SYMBOL_SECTIONPLANE ^p
+ID_tbyq_symbol_sectioncutter [_Button("¶ÏÃæ·ûºÅ", yq_dmf, yq_dmf)]^c^c^pYQ_SYMBOL_SECTIONCUTTER ^p
+ID_tbyq_symbol_gradient      [_Button("ÆÂ¶È·ûºÅ", yq_pd, yq_pd)]^c^c^pYQ_SYMBOL_GRADIENT ^p
+ID_tbyq_disconnection_line   [_Button("ÕÛ¶ÏÏß", yq_zx, yq_zx)]^c^c^pYQ_DISCONNECTION_LINE ^p
+ID_tbyq_pipecutting          [_Button("Ô²¹ÜÆÊÏß", yq_gpx, yq_gpx)]^c^c^pYQ_PIPECUTTING ^p
+ID_tbyq_symmetry_axis        [_Button("¶Ô³ÆÖá", yq_dcz, yq_dcz)]^c^c^pYQ_SYMMETRY_AXIS ^p
+ID_tbyq_central_line         [_Button("ÖÐÐÄÏß", yq_zxx, yq_zxx)]^c^c^pYQ_CENTRAL_LINE ^p
+[--]
+ID_tbyq_wiresurround    [_Button("»­µçÏß°ëÔ²¿çÏß", yq_ac, yq_ac)]^c^c^pYQ_WIRESURROUND ^p
+ID_tbyq_erasesurround   [_Button("É¾µçÏß°ëÔ²¿çÏß", yq_ec, yq_ec)]^c^c^pYQ_ERASESURROUND ^p
+[--]
+ID_tbyq_bentarrow       [_Button("Íä¼ýÍ·", yq_aaw, yq_aaw)]^c^c^pYQ_BENTARROW ^p
+ID_tbyq_entrancearrow   [_Button("³öÈë¿Ú¼ýÍ·", yq_aae, yq_aae)]^c^c^pYQ_ENTRANCEARROW ^p
+
+**Indexers
+ID_tbIndexers           [_Toolbar("Ô´Èª.Ë÷Òý±êÌâ", _right, _show, 2, 5, 1)]
+ID_tbyq_sldindexers     [_Button("Ë÷Òý·ûºÅ¼¯", yq_sy, yq_sy)]^c^c^pYQ_SLDINDEXERS ^p
+[--]
+ID_tbyq_identifier1     [_Button("ÆÊÇÐË÷ÒýºÅ1", yq_sy1, yq_sy1)]^c^c^pYQ_IDENTIFIER1 ^p
+ID_tbyq_identifier2     [_Button("ÆÊÇÐË÷ÒýºÅ2", yq_sy2, yq_sy2)]^c^c^pYQ_IDENTIFIER2 ^p
+ID_tbyq_identifier3     [_Button("ÆÊÇÐË÷ÒýºÅ3", yq_sy3, yq_sy3)]^c^c^pYQ_IDENTIFIER3 ^p
+ID_tbyq_elevindexer4in1 [_Button("Á¢ÃæË÷ÒýºÅ4ºÏ1", yq_i0, yq_i0)]^c^c^pYQ_ELEVINDEXER4IN1 ^p
+ID_tbyq_elevindexer1    [_Button("Á¢ÃæË÷ÒýºÅ1", yq_i1, yq_i1)]^c^c^pYQ_ELEVINDEXER1 ^p
+ID_tbyq_elevindexer2    [_Button("Á¢ÃæË÷ÒýºÅ2", yq_i2, yq_i2)]^c^c^pYQ_ELEVINDEXER2 ^p
+ID_tbyq_elevindexer3    [_Button("Á¢ÃæË÷ÒýºÅ3", yq_i3, yq_i3)]^c^c^pYQ_ELEVINDEXER3 ^p
+ID_tbyq_elevindexer4    [_Button("Á¢ÃæË÷ÒýºÅ4", yq_i4, yq_i4)]^c^c^pYQ_ELEVINDEXER4 ^p
+[--]
+ID_tbyq_detailsymbol1   [_Button("ÏêÍ¼·ûºÅ1", yq_xt1, yq_xt1)]^c^c^pYQ_DETAILSYMBOL1 ^p
+ID_tbyq_detailsymbol2   [_Button("ÏêÍ¼·ûºÅ2", yq_xt2, yq_xt2)]^c^c^pYQ_DETAILSYMBOL2 ^p
+[--]
+ID_tbyq_indexer1        [_Button("×ÔÉèË÷Òý·û1", yq_s1, yq_s1)]^c^c^pYQ_INDEXER1 ^p
+ID_tbyq_indexer2        [_Button("×ÔÉèË÷Òý·û2", yq_s2, yq_s2)]^c^c^pYQ_INDEXER2 ^p
+ID_tbyq_indexer3        [_Button("×ÔÉèË÷Òý·û3", yq_s3, yq_s3)]^c^c^pYQ_INDEXER3 ^p
+ID_tbyq_indexer4        [_Button("×ÔÉèË÷Òý·û4", yq_s4, yq_s4)]^c^c^pYQ_INDEXER4 ^p
+ID_tbyq_indexer5        [_Button("×ÔÉèË÷Òý·û5", yq_s4, yq_s4)]^c^c^pYQ_INDEXER5 ^p
+ID_tbyq_indexer6        [_Button("×ÔÉèË÷Òý·û6", yq_s3, yq_s3)]^c^c^pYQ_INDEXER6 ^p
+ID_tbyq_indexer7        [_Button("×ÔÉèË÷Òý·û6", yq_s3, yq_s3)]^c^c^pYQ_INDEXER7 ^p
+ID_tbyq_indexer8        [_Button("×ÔÉèË÷Òý·û6", yq_s3, yq_s3)]^c^c^pYQ_INDEXER8 ^p
+ID_tbyq_indexer9        [_Button("×ÔÉèË÷Òý·û6", yq_s3, yq_s3)]^c^c^pYQ_INDEXER9 ^p
+[--]
+ID_tbyq_leader          [_Button("¼ýÍ·ÒýÏß", yq_aax, yq_aax)]^c^c^pYQ_LEADER ^p
+ID_tbyq_mptleader       [_Button("¶àµãÒýÏß", yq_aaxx, yq_aaxx)]^c^c^pYQ_MPTLEADER ^p
+ID_tbyq_mptleader_y     [_Button("ÊúÖ±¶àµãÒýÏß", yq_aayy, yq_aayy)]^c^c^pYQ_MPTLEADER_Y ^p
+ID_tbyq_leader_vertexes [_Button("ÒýÏßÔöÉ¾¶¥µã", yq_aav, yq_aav)]^c^c^pYQ_LEADER_VERTEXES ^p
+ID_tbyq_leader_addarrow [_Button("ÒýÏß¼Ó¼ýÍ·", yq_aaj, yq_aaj)]^c^c^pYQ_LEADER_ADDARROW ^p
+[--]
+ID_tbyq_drawingtitle    [_Button("×°ÊÎÍ¼±êÌâÎÄ×Ö", yq_bt, yq_bt)]^c^c^pYQ_DRAWINGTITLE ^p
+
+**Statistics
+ID_tbStatistics         [_Toolbar("Ô´Èª.Í³¼Æ¹¤¾ß", _right, _show, 2, 6, 1)]
+ID_tbyq_sldstatistics   [_Button("Í³¼Æ¹¤¾ß¼¯", yq_tj, yq_tj)]^c^c^pYQ_SLDSTATISTICS ^p
+[--]
+ID_tbyq_selecteasy      [_Button("Ñ¡ÔñÒ×", yq_ss, yq_ss)]^c^c^pXC_SS ^p
+[--]
+ID_tbyq_autoserialnumber     [_Button("×Ô¶¯±àºÅ", yq_abh, yq_abh)]^c^c^pYQ_AUTOSERIALNUMBER ^p
+ID_tbyq_emptytable      [_Button("»æÖÆµÈ¿í¿Õ±í¸ñ", yq_kbg, yq_kbg)]^c^c^pYQ_EMPTYTABLE ^p
+ID_tbyq_text2center     [_Button("±í¸ñµ¥ÔªÎÄ×Ö¾ÓÖÐ", yq_bgz, yq_bgz)]^c^c^pYQ_TEXT2CENTER ^p
+ID_tbyq_calc_cellarea   [_Button("Í³¼ÆÇøÓòÃæ»ý", yq_tmj, yq_tmj)]^c^c^pYQ_CALC_CELLAREA ^p
+ID_tbyq_texts2excel     [_Button("Êä³öµ½±í¸ñÈí¼þ", yq_t2e, yq_t2e)]^c^c^pYQ_TEXTS2EXCEL ^p
+ID_tbyq_texts2acadTable [_Button("ÎÄ×Ö±í¸ñ×ª±í¸ñ", yq_tb, yq_tb)]^c^c^pYQ_TEXTS2ACADTABLE ^p
+[--]
+ID_tbyq_windoor_list    [_Button("Í³¼ÆÃÅ´°±í", yq_mcb, yq_mcb)]^c^c^pYQ_WINDOOR_LIST ^p
+ID_tbyq_block_list      [_Button("Í³¼ÆÍ¼¿é", yq_bbl, yq_bbl)]^c^c^pYQ_BLOCK_LIST ^p
+ID_tbyq_blockatt_list   [_Button("Í³¼Æ¿éÊôÐÔºÍ¶¯Ì¬²ÎÊý", yq_sxl, yq_sxl)]^c^c^pYQ_BLOCKATT_LIST ^p
+ID_tbyq_coordinate_list [_Button("ÕÒ×ø±ê²¢ÁÐ±í", yq_zzb, yq_zzb)]^c^c^pYQ_COORDINATE_LIST ^p
+ID_tbyq_string_list     [_Button("ÌáÈ¡×Ö´®²¢ÁÐ±í", yq_ttq, yq_ttq)]^c^c^pYQ_STRING_LIST ^p
+ID_tbyq_material_list   [_Button("ÌáÈ¡Éú³É²ÄÁÏ±í", yq_clb, yq_clb)]^c^c^pYQ_MATERIAL_LIST ^p
+[--]
+ID_Area and volume    [_Button("Area and volume", ar_s.bmp, ar_l.bmp)]^c^Car
+ID_tbyq_calc_sumarea    [_Button("Í³¼ÆÃæ»ý×ÜÃæ»ý", yq_mj, yq_mj)]^c^c^pYQ_CALC_SUMAREA ^p
+ID_tbyq_asso_area       [_Button("ÎÄ×Ö¹ØÁªÃæ»ý", yq_pmj, yq_pmj)]^c^c^pYQ_ASSO_AREA ^p
+ID_tbyq_calc_perimeter  [_Button("Í³¼ÆÖÜ³¤×ÜÖÜ³¤", yq_zc, yq_zc)]^c^c^pYQ_CALC_PERIMETER ^p
+ID_tbyq_asso_perimeter  [_Button("ÎÄ×Ö¹ØÁªÖÜ³¤", yq_pzc, yq_pzc)]^c^c^pYQ_ASSO_PERIMETER ^p
+ID_tbyq_calweight       [_Button("¸ù¾ÝÃÜ¶È¼ÆËãÖØÁ¿", yq_zl, yq_zl)]^c^c^pYQ_CALWEIGHT ^p
+[--]
+ID_tbyq_AreaStat        [_Button("½¨ÖþÃæ»ý·ÖÌ¯±í", yq_ftb, yq_ftb)]^c^c^pYQ_AREASTAT ^p
+[--]
+ID_tbyq_calc_addition   [_Button("Êý×ÖµÄºÍ(£«)", yq_he, yq_he)]^c^c^pYQ_CALC_ADDITION ^p
+ID_tbyq_calc_subtration [_Button("Êý×ÖµÄ²î(£­)", yq_cha, yq_cha)]^c^c^pYQ_CALC_SUBTRATION ^p
+ID_tbyq_calc_multiplication  [_Button("Êý×ÖµÄ»ý(¡Á)", yq_ji, yq_ji)]^c^c^pYQ_CALC_MULTIPLICATION ^p
+ID_tbyq_calc_division   [_Button("Êý×ÖµÄÉÌ(¡Â)", yq_chu, yq_chu)]^c^c^pYQ_CALC_DIVISION ^p
+[--]
+ID_tbyq_calc_expression [_Button("¼ÆËãÊýÑ§±í´ïÊ½", yq_js, yq_js)]^c^c^pYQ_CALC_EXPRESSION ^p
+
+**TextContent
+ID_tbTextContent        [_Toolbar("Ô´Èª.ÎÄ×ÖÄÚÈÝ", _right, _show, 2, 7, 1)]
+ID_tbyq_userdict        [_Button("ÓÃ»§´Ê¿â¹ÜÀí", yq_dic, yq_dic)]^c^c^pYQ_USERDICT ^p
+ID_tbyq_translate       [_Button("ÖÐÓ¢·­ÒëÑ¡ÖÐÎÄ×Ö", yq_fy, yq_fy)]^c^c^pYQ_TRANSLATE ^p
+ID_tbyq_updtextlist     [_Button("ÁÐ±íË¢ÐÂÎÄ×Ö", yq_eq, yq_eq)]^c^c^pYQ_UPDTEXTLIST ^p
+[--]
+ID_tbyq_text            [_Button("ÊäÈëµ¥ÐÐÎÄ±¾", yq_tt, yq_tt)]^c^c^pYQ_TEXT ^p
+ID_tbyq_superedit       [_Button("±à¼­¸÷ÖÖÎÄ×Ö", yq_tte, yq_tte)]^c^c^pYQ_SUPEREDIT ^p
+ID_tbyq_dict2text       [_Button("ÓÃ×Öµä»»×Ö", yq_ttg, yq_ttg)]^c^c^pYQ_DICT2TEXT ^p
+ID_tbyq_hz_text         [_Button("ÐÂ½¨»òÊäÈëÎÄ±¾", yq_ctext, yq_ctext)]^c^c^pYQ_HZ_TEXT ^p
+ID_tbyq_hz_edit         [_Button("±à¼­»òÊä³öÎÄ±¾", yq_ced, yq_ced)]^c^c^pYQ_HZ_EDIT ^p
+[--]
+ID_tbyq_text_replace    [_Button("ÎÄ×ÖÌæ»»»ò¼ÆËãÌæ»»", yq_ttr, yq_ttr)]^c^c^pYQ_TEXT_REPLACE ^p
+ID_tbyq_replace_substrs [_Button("Ìæ»»¶à¸öÎÄ×Ö×Ó´®", yq_ttrs, yq_ttrs)]^c^c^pYQ_REPLACE_SUBSTRS ^p
+[--]
+ID_tbyq_text_append     [_Button("Á¬½Ó¶à¸öÎÄ×Ö", yq_tta, yq_tta)]^c^c^pYQ_TEXT_APPEND ^p
+ID_tbyq_jtext           [_Button("·ÖÐÐºÏ²¢¶àÎÄ×Ö", yq_ttj, yq_ttj)]^c^c^pYQ_JTEXT ^p
+ID_tbyq_text_break2     [_Button("´ò¶ÏÎÄ×ÖÎªÁ½¶Î", yq_ttb, yq_ttb)]^c^c^pYQ_TEXT_BREAK2 ^p
+ID_tbyq_etext           [_Button("´òÉ¢ÎÄ×ÖÎª×Ö·û", yq_ttbb, yq_ttbb)]^c^c^pYQ_ETEXT ^p
+[--]
+ID_tbyq_array_numbers   [_Button("µÝÔö¸´ÖÆÊýÖµÎÄ×Ö", yq_123, yq_123)]^c^c^pYQ_ARRAY_NUMBERS ^p
+ID_tbyq_increase_numbers   [_Button("Êý×ÖÍ³Ò»¼ÓÔöÁ¿", yq_inc, yq_inc)]^c^c^pYQ_INCREASE_NUMBERS ^p
+ID_tbyq_increase_text   [_Button("µÝÔöÊý×ÖÎÄ×Ö", yq_ttz, yq_ttz)]^c^c^pYQ_INCREASE_TEXT ^p
+ID_tbyq_findtext        [_Button("Ñ°ÕÒÌØ¶¨ÎÄ×Ö", yq_ttf, yq_ttf)]^c^c^pYQ_FINDTEXT ^p
+[--]
+ID_tbyq_exchangelocation   [_Button("½»»»ÎÄ±¾ÄÚÈÝ", yq_jh, yq_jh)]^c^c^pYQ_EXCHANGELOCATION ^p
+[--]
+ID_tbyq_match_content   [_Button("Ë¢×Ó.Æ¥ÅäÎÄ×ÖÄÚÈÝ", yq_sst, yq_sst)]^c^c^pYQ_MATCH_CONTENT ^p
+ID_tbyq_match_style     [_Button("Ë¢×Ó.Æ¥ÅäÎÄ×ÖÑùÊ½", yq_ssst, yq_ssst)]^c^c^pYQ_MATCH_STYLE ^p
+ID_tbyq_match_textheight   [_Button("Ë¢×Ó.Æ¥ÅäÎÄ×Ö¸ß¶È", yq_ssh, yq_ssh)]^c^c^pYQ_MATCH_TEXTHEIGHT ^p
+ID_tbyq_match_tagtext   [_Button("Ë¢×Ó.Æ¥Åä±êÇ©ÄÚÈÝ", yq_ssq, yq_ssq)]^c^c^pYQ_MATCH_TAGTEXT ^p
+
+**TextOther
+ID_tbTextOther          [_Toolbar("Ô´Èª.ÎÄ×ÖÆäËû", _right, _show, 2, 7, 1)]
+ID_tbyq_sldstyles       [_Button("ÐÂ½¨ÎÄ×ÖÑùÊ½", yq_ttn, yq_ttn)]^c^c^pYQ_SLDSTYLES ^p
+[--]
+ID_tbyq_text_cstyle     [_Button("Éè¶¨µ±Ç°ÎÄ×ÖÑùÊ½", yq_tts, yq_tts)]^c^c^pYQ_TEXT_CSTYLE ^p
+ID_tbyq_text_update     [_Button("Ñ¡ÑùÊ½¸üÐÂÎÄ×Ö", yq_ttu, yq_ttu)]^c^c^pYQ_TEXT_UPDATE ^p
+ID_tbyq_replacefonts    [_Button("×Ô¶¯Ìæ»»È±ÎÄ×Öµµ", yq_ttrf, yq_ttrf)]^c^c^pYQ_REPLACEFONTS ^p
+[--]
+ID_tbyq_changetext      [_Button("ÅúÁ¿ÎÄ×ÖÐÞ¸ÄÅÅ°æµÈ", yq_ttc, yq_ttc)]^c^c^pYQ_CHANGETEXT ^p
+ID_tbyq_text_width      [_Button("ÐÞ¸Ä¸ß¶È/¸ß¿í±È", yq_ttw, yq_ttw)]^c^c^pYQ_TEXT_WIDTH ^p
+ID_tbyq_reordertexts    [_Button("ÎÄ×Ö(±í¸ñ)ÖØÐÂÅÅÐò", yq_ttpx, yq_ttpx)]^c^c^pYQ_REORDERTEXTS ^p
+[--]
+ID_tbyq_text_alignmentleft   [_Button("¶ÔÕý·½Ê½¸ÄÎª×óÏÂ", yq_ttl, yq_ttl)]^c^c^pYQ_TEXT_ALIGNMENTLEFT ^p
+ID_tbyq_text_alignmentright  [_Button("¶ÔÕý·½Ê½¸ÄÎªÓÒÏÂ", yq_ttll, yq_ttll)]^c^c^pYQ_TEXT_ALIGNMENTRIGHT ^p
+ID_tbyq_text_restoremirr     [_Button("µ¥ÐÐÎÄ×Ö¾µÏñ»Ö¸´", yq_ttrr, yq_ttrr)]^c^c^pYQ_TEXT_RESTOREMIRR ^p
+[--]
+ID_tbyq_text2attdef     [_Button("×ª»»ÎÄ×Ö»òÊôÐÔ¶¨Òå", yq_ttsx, yq_ttsx)]^c^c^pYQ_TEXT2ATTDEF ^p
+ID_tbyq_txtexp          [_Button("Õ¨ËéÎÄ×ÖÎªÏß¶Î", yq_ttx, yq_ttx)]^c^c^pYQ_TXTEXP ^p
+
+**DimensionDraw
+ID_tbDimensionDraw      [_Toolbar("Ô´Èª.±ê×¢»æÖÆ", _right, _show, 2, 8, 1)]
+ID_tbyq_setdwgscale     [_Button("ÉèÖÃÍ¼Ö½/·ûºÅ±ÈÀý", yq_sd, yq_sd)]^c^c^pYQ_SETDWGSCALE ^p
+[--]
+ID_tbyq_dim_linear      [_Button("Ë®Æ½´¹Ö±ÏßÐÔ±ê×¢", yq_dd, yq_dd)]^c^c^pYQ_DIM_LINEAR ^p
+ID_tbyq_dim_aligned     [_Button("¶ÔÆë±ê×¢", yq_ddx, yq_ddx)]^c^c^pYQ_DIM_ALIGNED ^p
+ID_tbyq_dim_baseline    [_Button("»ùÏß±ê×¢", yq_ddb, yq_ddb)]^c^c^pYQ_DIM_BASELINE ^p
+ID_tbyq_dim_radius      [_Button("°ë¾¶±ê×¢", yq_ddr, yq_ddr)]^c^c^pYQ_DIM_RADIUS ^p
+ID_tbyq_dim_diameter    [_Button("Ö±¾¶±ê×¢", yq_ddj, yq_ddj)]^c^c^pYQ_DIM_DIAMETER ^p
+ID_tbyq_dim_angular     [_Button("½Ç¶È±ê×¢", yq_ddan, yq_ddan)]^c^c^pYQ_DIM_ANGULAR ^p
+ID_tbyq_dim_arc         [_Button("»¡³¤±ê×¢", yq_ddar, yq_ddar)]^c^c^pYQ_DIM_ARC ^p
+ID_tbyq_dim_arc3pts     [_Button("3µã»¡³¤±ê×¢", yq_dda3, yq_dda3)]^c^c^pYQ_DIM_ARC3PTS ^p
+ID_tbyq_dim_qdim        [_Button("¿ìËÙ±ê×¢", yq_ddq, yq_ddq)]^c^c^pYQ_DIM_QDIM ^p
+[--]
+ID_tbyq_dim_closedspace [_Button("±ÕºÏ¿Õ¼ä×Ô¶¯±ê×¢", yq_ddz, yq_ddz)]^c^c^pYQ_DIM_CLOSEDSPACE ^p
+ID_tbyq_dim_pline       [_Button("±ÕºÏ¶à¶ÎÏß±ê×¢", yq_ddzz, yq_ddzz)]^c^c^pYQ_DIM_PLINE ^p
+ID_tbyq_dim_polygonsides   [_Button("±ê×¢¶à¶ÎÏß/Ïß±ß³¤", yq_ddss, yq_ddss)]^c^c^pYQ_DIM_POLYGONSIDES ^p
+[--]
+ID_tbyq_dim_axiswd      [_Button("ÃÅ´°¼°ÖáÏß±ê×¢", yq_ddw, yq_ddw)]^c^c^pYQ_DIM_AXISWD ^p
+ID_tbyq_dim_blocks      [_Button("Í¼¿é¼°ÄÚÇ½±ê×¢", yq_ddww, yq_ddww)]^c^c^pYQ_DIM_BLOCKS ^p
+ID_tbyq_dim_cupboard    [_Button("Á¢Ãæ¹ñ×Ó±ê×¢", yq_ddgz, yq_ddgz)]^c^c^pYQ_DIM_CUPBOARD ^p
+[--]
+ID_tbyq_dim_stairs      [_Button("Â¥ÌÝÌ¤²½µÈ·Ö±ê×¢", yq_ddst, yq_ddst)]^c^c^pYQ_DIM_STAIRS ^p
+ID_tbyq_dim_intpts      [_Button("À­Ïß°´½»µã±ê×¢", yq_ddxx, yq_ddxx)]^c^c^pYQ_DIM_INTPTS ^p
+ID_tbyq_dim_curveintpts [_Button("ÕÒÇúÏß½»µã±ê×¢ÏÒ³¤", yq_ddcc, yq_ddcc)]^c^c^pYQ_DIM_CURVEINTPTS ^p
+ID_tbyq_dim_arcparts    [_Button("ÕÒÔ²»¡½»µã±ê×¢»¡³¤", yq_ddcc, yq_ddcc)]^c^c^pYQ_DIM_ARCPARTS ^p
+ID_tbyq_dim_rearrange   [_Button("Ñ¡Êý×ÖÅÅÁÐÖØ½¨±ê×¢", yq_ddp, yq_ddp)]^c^c^pYQ_DIM_REARRANGE ^p
+ID_tbyq_dim_mergebase   [_Button("ºÏ²¢»æÖÆ»ùÏß±ê×¢", yq_ddbb, yq_ddbb)]^c^c^pYQ_DIM_MERGEBASE ^p
+[--]
+ID_tbyq_dim_switchlayer [_Button("ÇÐ»»±ê×¢Í¼²ã", yq_dder, yq_dder)]^c^c^pYQ_DIM_SWITCHLAYER ^p
+ID_tbyq_dim_cstyle      [_Button("Éè¶¨µ±Ç°±ê×¢ÑùÊ½", yq_dds, yq_dds)]^c^c^pYQ_DIM_CSTYLE ^p
+ID_tbyq_dim_update      [_Button("Ñ¡ÑùÊ½¸üÐÂ±ê×¢", yq_ddu, yq_ddu)]^c^c^pYQ_DIM_UPDATE ^p
+ID_tbyq_dim_switchstyle [_Button("ÇÐ»»Ç¿ÖÆÔ´ÈªÑùÊ½", yq_ddyq, yq_ddyq)]^c^c^pYQ_DIM_SWITCHSTYLE ^p
+
+**DimensionModify
+ID_tbDimensionModify    [_Toolbar("Ô´Èª.±ê×¢ÐÞ¸Ä", _right, _show, 2, 9, 1)]
+ID_tbyq_dim_adjust      [_Button("±ê×¢ÎÄ×Ö±ÜÈÃ", yq_ddaa, yq_ddaa)]^c^c^pYQ_DIM_ADJUST ^p
+[--]
+ID_tbyq_dim_extend      [_Button("ÒÆ¶¯½Åµã", yq_dde, yq_dde)]^c^c^pYQ_DIM_EXTEND ^p
+ID_tbyq_dim_divide      [_Button("·ÖÁÑÀ©Õ¹Îª¶à¸ö", yq_dd2, yq_dd2)]^c^c^pYQ_DIM_DIVIDE ^p
+ID_tbyq_dim_merge       [_Button("±ê×¢ºÏ²¢", yq_dd1, yq_dd1)]^c^c^pYQ_DIM_MERGE ^p
+ID_tbyq_dim_align       [_Button("ÅÅÆë½Åµã½çÏß", yq_ddl, yq_ddl)]^c^c^pYQ_DIM_ALIGN ^p
+ID_tbyq_dim_aligndimline   [_Button("ÅÅÆë½çÏß", yq_ddll, yq_ddll)]^c^c^pYQ_DIM_ALIGNDIMLINE ^p
+ID_tbyq_dim_alignpoints    [_Button("ÅÅÆë½Åµã", yq_ddl, yq_ddl)]^c^c^pYQ_DIM_ALIGNPOINTS ^p
+ID_tbyq_dim_extlen         [_Button("Í³Ò»±ê×¢½çÏß³¤¶È", yq_ddle, yq_ddle)]^c^c^pYQ_DIM_EXTLEN ^p
+ID_tbyq_dim_adjustbase     [_Button("ÐÞÕý»ùÏß¼ä¾à", yq_ddy, yq_ddy)]^c^c^pYQ_DIM_ADJUSTBASE ^p
+ID_tbyq_dim_batchbase      [_Button("ÅúÁ¿»ùÏß¼ä¾à", yq_ddyy, yq_ddyy)]^c^c^pYQ_DIM_BATCHBASE ^p
+ID_tbyq_dim_showextline    [_Button("ÏÔÊ¾2½ÅÏß", yq_dd2e, yq_dd2e)]^c^c^pYQ_DIM_SHOWEXTLINE ^p
+ID_tbyq_dim_switch_ar      [_Button("×ª»»Îª¶ÔÆë»ò×ª½Ç±ê×¢", yq_ddra, yq_ddra)]^c^c^pYQ_DIM_SWITCH_AR ^p
+[--]
+ID_tbyq_dim_reverse     [_Button("·­×ª±ê×¢ÎÄ×Ö", yq_ddfz, yq_ddfz)]^c^c^pYQ_DIM_REVERSE ^p
+ID_tbyq_dim_fix         [_Button("¹Ì»¯±ê×¢ÎÄ×Ö", yq_ddf, yq_ddf)]^c^c^pYQ_DIM_FIX ^p
+ID_tbyq_dim_recover     [_Button("±ê×¢»Ö¸´Ô­Öµ", yq_ddre, yq_ddre)]^c^c^pYQ_DIM_RECOVER ^p
+ID_tbyq_dim_mmtom       [_Button("µ¥Î»×ª»¯ÎªÃ×", yq_ddm, yq_ddm)]^c^c^pYQ_DIM_MMTOM ^p
+ID_tbyq_dim_round       [_Button("ÐÞ¸Ä±ê×¢¾«¶È", yq_dd0, yq_dd0)]^c^c^pYQ_DIM_ROUND ^p
+ID_tbyq_dim_newtext     [_Button("¼üÈëÐÂ±ê×¢ÎÄ×Ö", yq_ddn, yq_ddn)]^c^c^pYQ_DIM_NEWTEXT ^p
+[--]
+ID_tbyq_dim_tedit       [_Button("±ê×¢ÎÄ×ÖÒÆÎ»", yq_ddt, yq_ddt)]^c^c^pYQ_DIM_TEDIT ^p
+ID_tbyq_dim_home        [_Button("±ê×¢ÎÄ×Ö¸´Î»", yq_ddh, yq_ddh)]^c^c^pYQ_DIM_HOME ^p
+
+**CurveTools
+ID_tbCurveTools         [_Toolbar("Ô´Èª.ÇúÏß¹¤¾ß", _right, _show, 2, 10, 1)]
+ID_tbyq_pline_vertexes  [_Button("¶à¶ÎÏßÔöÉ¾¶¥µã", yq_xxv, yq_xxv)]^c^c^pYQ_PLINE_VERTEXES ^p
+ID_tbyq_pline_optimize  [_Button("ÓÅ»¯¶à¶ÎÏß¶¥µã", yq_xxy, yq_xxy)]^c^c^pYQ_PLINE_OPTIMIZE ^p
+[--]
+ID_tbyq_plsegment_arc   [_Button("¶à¶ÎÏßµÄ¶Î±ä»¡", yq_xxa, yq_xxa)]^c^c^pYQ_LINE2ARC ^p
+ID_tbyq_plsegment_width [_Button("¶à¶ÎÏß¸Ä¶Î¿í", yq_xxw, yq_xxw)]^c^c^pYQ_PLSEGMENT_WIDTH ^p
+ID_tbyq_plsegment_offset [_Button("Æ«ÒÆ¶à¶ÎÏßµÄÒ»¶Î", yq_xxs, yq_xxs)]^c^c^pYQ_PLSEGMENT_OFFSET ^p
+[--]
+ID_tbyq_pline_join      [_Button("Á¬³É¶à¶ÎÏß", yq_xxj, yq_xxj)]^c^c^pYQ_PLINE_JOIN ^p
+ID_tbyq_pline_close     [_Button("Á¬³É±ÕºÏ¶à¶ÎÏß", yq_xxc, yq_xxc)]^c^c^pYQ_PLINE_CLOSE ^p
+ID_tbyq_pline_reverse   [_Button("·´×ªÇúÏß·½Ïò", yq_xxfz, yq_xxfz)]^c^c^pYQ_PLINE_REVERSE ^p
+ID_tbyq_wpline2wireframe    [_Button("ºñ¶È¶à¶ÎÏß±äÏß¿ò", yq_xxf, yq_xxf)]^c^c^pYQ_WPLINE2WIREFRAME ^p
+ID_tbyq_connectvertexes [_Button("Á¬½ÓÁ½¸ù¶à¶ÎÏß¶¥µã", yq_ljx, yq_ljx)]^c^c^pYQ_CONNECTVERTEXES ^p
+[--]
+ID_tbyq_outline         [_Button("Çó±ß½çÏß/ÍâÂÖÀªÏß", yq_lk, yq_lk)]^c^c^pYQ_OUTLINE ^p
+ID_tbyq_innercontours   [_Button("ÇóÄÚ²¿ÂÖÀªÏß", yq_nlk, yq_nlk)]^c^c^pYQ_INNERCONTOURS ^p
+ID_tbyq_inneroffset     [_Button("ÇóÄÚÂÖÀª+Æ«ÒÆ", yq_nlks, yq_nlks)]^c^c^pYQ_INNEROFFSET ^p
+ID_tbyq_tofreehand      [_Button("ÊÖ»æÐ§¹ûÏßÌõ¶¶¶¯", yq_hw, yq_hw)]^c^c^pYQ_TOFREEHAND ^p
+[--]
+ID_tbyq_break_equal     [_Button("µÈ·ÖÇúÏß", yq_df, yq_df)]^c^c^pYQ_BREAK_EQUAL ^p
+ID_tbyq_2ptsdivide      [_Button("Á½µãµÈ·Ö", yq_dfx, yq_dfx)]^c^c^pYQ_2PTSDIVIDE ^p
+[--]
+ID_tbyq_ellipse2arc     [_Button("ÓÃÔ²»¡Ä£ÄâÍÖÔ²", yq_e2a, yq_e2a)]^c^c^pYQ_ELLIPSE2ARC ^p
+ID_tbyq_spline2apline   [_Button("ÇúÏß×ªÔ²»¡¶à¶ÎÏß", yq_cca, yq_cca)]^c^c^pYQ_SPLINE2APLINE ^p
+ID_tbyq_spline2xpline   [_Button("ÇúÏß×ªÏß¶Î¶à¶ÎÏß", yq_ccx, yq_ccx)]^c^c^pYQ_SPLINE2XPLINE ^p
+ID_tbyq_curve2bowstring [_Button("µÈÏÒ³¤·ÖÇúÏß", yq_ccxx, yq_ccxx)]^c^c^pYQ_CURVE2BOWSTRING ^p
+ID_tbyq_curveprojection [_Button("ÇóÇúÏßÍ¶Ó°Ïß", yq_ccy, yq_ccy)]^c^c^pYQ_CURVEPROJECTION ^p
+[--]
+ID_tbyq_match_width     [_Button("Ë¢×Ó.¶à¶ÎÏß¿í¶È", yq_ssw, yq_ssw)]^c^c^pYQ_MATCH_WIDTH ^p
+
+**ExtraTools
+ID_tbExtraTools         [_Toolbar("Ô´Èª.ÌØÊâ¹¤¾ß", _right, _show, 2, 11, 1)]
+ID_tbyq_numberlines     [_Button("Êý×ÖÐÐ¹ÜÀíÓëÓ¦ÓÃ", yq_vv, yq_vv)]^c^c^pYQ_NUMBERLINES ^p
+[--]
+ID_tbyq_doubleline      [_Button("»æÖÆË«Ïß", yq_dx, yq_dx)]^c^c^pYQ_DOUBLELINE ^p
+ID_tbyq_trimdoubleline  [_Button("ÐÞ¼ôË«Ïß", yq_tx, yq_tx)]^c^c^pYQ_TRIMDOUBLELINE ^p
+ID_tbyq_dlineThickness  [_Button("ÐÞÕýË«Ïßºñ¶È", yq_xdt, yq_xdt)]^c^c^pYQ_DLINETHICKNESS ^p
+ID_tbyq_2doubleline     [_Button("µ¥Ïß±äË«Ïß", yq_xdx, yq_xdx)]^c^c^pYQ_2DOUBLELINE ^p
+ID_tbyq_2doubleline     [_Button("Ë«Ïß¾»¾àÆ«ÒÆ", yq_xdo, yq_xdo)]^c^c^pYQ_DLINE_OFFSET ^p
+ID_tbyq_doublelineAxis  [_Button("ÇóË«ÏßÖÐÖáÏß", yq_ce, yq_ce)]^c^c^pYQ_DOUBLELINEAXIS ^p
+[--]
+ID_tbyq_alignment       [_Button("¶ÔÆëÍ¼Ôª", yq_dq, yq_dq)]^c^c^pYQ_ALIGNMENT ^p
+ID_tbyq_leaderalign     [_Button("¼ýÍ·ÒýÏß¶ÔÆë", yq_aadq, yq_aadq)]^c^c^pYQ_LEADERALIGN ^p
+ID_tbyq_leaderalign     [_Button("Í¼¿ò°´Ïß³¤µ÷Õû", yq_tktz, yq_tktz)]^c^c^pYQ_ALIGNFRAME ^p
+[--]
+ID_tbyq_breakbyknife    [_Button("»­ÏßÇÐ¸î", yq_bd, yq_bd)]^c^c^pYQ_BREAKBYKNIFE ^p
+ID_tbyq_BreakByKnives   [_Button("¶àÏßÇÐ¸î", yq_bdd, yq_bdd)]^c^c^pYQ_BREAKBYKNIVES ^p
+ID_tbyq_BreakAndErase   [_Button("´ò¶ÏÉ¾³ý¿òÄÚÍ¼Ôª", yq_bx, yq_bx)]^c^c^pYQ_BREAKANDERASE ^p
+ID_tbyq_pastedetaildwg  [_Button("ÇÐ¸îÌáÈ¡´óÑùÍ¼", yq_qg, yq_qg)]^c^c^pYQ_PASTEDETAILDWG ^p
+[--]
+ID_tbyq_transform       [_Button("ËÄ±ßÐÎ¼°ÆäËû±äÐÎ", yq_tf, yq_tf)]^c^c^pYQ_TRANSFORM ^p
+[--]
+ID_tbyq_boundingbox     [_Button("Çó¾ØÐÎÍâ¿ò", yq_jx, yq_jx)]^c^c^pYQ_BOUNDINGBOX ^p
+ID_tbyq_toboundingbox   [_Button("±ä¾ØÐÎÍâ¿ò", yq_wk, yq_wk)]^c^c^pYQ_TOBOUNDINGBOX ^p
+ID_tbyq_minBoundingbox  [_Button("×îÐ¡°ü¹ü¾ØÐÎ/Íâ½ÓÔ²", yq_xjx, yq_xjx)]^c^c^pYQ_MINBOUNDINGBOX ^p
+[--]
+ID_tbyq_overturn        [_Button("ËæÒâ·­×ª", yq_fz, yq_fz)]^c^c^pYQ_OVERTURN ^p
+ID_tbyq_exchangelocation    [_Button("Í¼Ôª½»»»Î»ÖÃ", yq_jh, yq_jh)]^c^c^pYQ_EXCHANGELOCATION ^p
+ID_tbyq_copy2points     [_Button("°´µãÕó²¼ÖÃÍ¼Ôª", yq_dzbz, yq_dzbz)]^c^c^pYQ_COPY2POINTS ^p
+ID_tbyq_assistantlines  [_Button("¿ì½Ý¸¨ÖúÏß", yq_fzx, yq_fzx)]^c^c^pYQ_ASSISTANTLINES ^p
+
+**ModifyPlus
+ID_tbModifyPlus         [_Toolbar("Ô´Èª.ÐÞ¸ÄÔöÇ¿", _right, _show, 2, 11, 1)]
+ID_tbyq_scale_each      [_Button("Í¼ÔªÔ­µØËõ·Å", yq_asc, yq_asc)]^c^c^pYQ_SCALE_EACH ^p
+ID_tbyq_rotate_each     [_Button("Í¼ÔªÔ­µØÐý×ª", yq_art, yq_art)]^c^c^pYQ_ROTATE_EACH ^p
+ID_tbyq_mirror_each     [_Button("Í¼ÔªÔ­µØ¾µÏñ", yq_ami, yq_ami)]^c^c^pYQ_MIRROR_EACH ^p
+ID_tbyq_scalexyz        [_Button("XY²»µÈ±ÈËõ·Å", yq_scx, yq_scx)]^c^c^pYQ_SCALEXYZ ^p
+[--]
+ID_tbyq_dynamiccopy     [_Button("¶¯Ì¬¿½±´", yq_cv, yq_cv)]^c^c^pYQ_DYNAMICCOPY ^p
+ID_tbyq_stretch_d       [_Button("´øÈ±Ê¡¾àÀëÀ­Éì", yq_std, yq_std)]^c^c^pYQ_STRETCH_D ^p
+ID_tbyq_move_d          [_Button("´øÈ±Ê¡¾àÀëÒÆ¶¯", yq_vd, yq_vd)]^c^c^pYQ_MOVE_D ^p
+ID_tbyq_move_memorial   [_Button("¼ÇÒäÒÆ¶¯", yq_vr, yq_vr)]^c^c^pYQ_MOVE_MEMORIAL ^p
+ID_tbyq_copy_memorial   [_Button("¼ÇÒä¿½±´", yq_cr, yq_cr)]^c^c^pYQ_COPY_MEMORIAL ^p
+[--]
+ID_tbyq_superoffset     [_Button("Í¬Ê±Æ«ÒÆ", yq_sf, yq_sf)]^c^c^pYQ_SUPEROFFSET ^p
+ID_tbyq_extendtopoint   [_Button("ÑÓ³¤µ½Ö¸¶¨µã»òÏß¶Î", yq_exx, yq_exx)]^c^c^pYQ_EXTENDTOPOINT ^p
+[--]
+ID_tbyq_join_arcline    [_Button("Á¬½ÓÏß/»¡/¶à¶ÎÏß", yq_ff, yq_ff)]^c^c^pYQ_JOIN_ARCLINE ^p
+ID_tbyq_connect2glines  [_Button("ÑÓ³¤¶Ô½ÓÁ½×éÏß¶Î", yq_fx, yq_fx)]^c^c^pYQ_CONNECT2GLINES ^p
+[--]
+ID_tbyq_quickwipeout    [_Button("¿ìËÙ¼Ó¼õÕÚÕÖ", yq_zz, yq_zz)]^c^c^pYQ_QUICKWIPEOUT ^p
+[--]
+ID_tbyq_breakall        [_Button("½»µãÆë¶Ï", yq_ba, yq_ba)]^c^c^pYQ_BREAKALL ^p
+ID_tbyq_breakerase      [_Button("¿òÑ¡´ò¶Ï²¢É¾³ý¶ÌÏß", yq_te, yq_te)]^c^c^pYQ_BREAKERASE ^p
+ID_tbyq_break_at        [_Button("Ò»µã´ò¶Ï", yq_bb, yq_bb)]^c^c^pYQ_BREAK_AT ^p
+ID_tbyq_break_at2       [_Button("¶þµã´ò¶Ï", yq_bf, yq_bf)]^c^c^pYQ_BREAK_AT2 ^p
+
+**CheckAndCorrect
+ID_tbCheckAndCorrect    [_Toolbar("Ô´Èª.¼ì²éÐÞÕý", _right, _show, 2, 12, 1)]
+ID_tbyq_clear_z         [_Button("ÅÄÆ½Í¼Ôª(ZÖá¹éÁã)", yq_z0, yq_z0)]^c^c^pYQ_CLEAR_Z ^p
+ID_tbyq_block_z0        [_Button("ÅÄÆ½Í¼¿é(ZÖá¹éÁã)", yq_bbz0, yq_bbz0)]^c^c^pYQ_BLOCK_Z0 ^p
+[--]
+ID_tbyq_remove_duplicate    [_Button("Ïû³ýÖØµþÍ¼Ôª", yq_rd, yq_rd)]^c^c^pYQ_REMOVE_DUPLICATE ^p
+ID_tbyq_lineunion       [_Button("ºÏ²¢ÖØµþÏß", yq_lu, yq_lu)]^c^c^pYQ_LINEUNION ^p
+ID_tbyq_linklinearc     [_Button("Á¬½Ó¶ÏÏß/¶ÏÔ²»¡Ïß", yq_lx, yq_lx)]^c^c^pYQ_LINKLINEARC ^p
+ID_tbyq_lineclean       [_Button("Çå³ýµã/¶ÌÏß/¿Õ×ÖµÈ", yq_lc, yq_lc)]^c^c^pYQ_LINECLEAN ^p
+ID_tbyq_adjust          [_Button("Í¼ÔªÐ£Õý¶ÔÆëµ½Íø¸ñ", yq_jz, yq_jz)]^c^c^pYQ_ADJUST ^p
+ID_tbyq_oblique_correction  [_Button("Ïß¶ÎÐ±¸ÄÕý", yq_xgz, yq_xgz)]^c^c^pYQ_OBLIQUE_CORRECTION ^p
+[--]
+ID_tbyq_merge           [_Button("ÔÓÏîºÏ²¢Í¼²ãµÈ", yq_xhb, yq_xhb)]^c^c^pYQ_MERGE ^p
+ID_tbyq_purgeall        [_Button("ÇåÀíÎÞÓÃÏîÄ¿", yq_pua, yq_pua)]^c^c^pYQ_PURGEALL ^p
+ID_tbyq_purgefiles      [_Button("ÇåÀíÎÄ¼þ¼ÐdwgÎÞÓÃÏî", yq_puf, yq_puf)]^c^c^pYQ_PURGEFILES ^p
+[--]
+ID_tbyq_checkcolor      [_Button("²éÍ¼ÔªÑÕÉ«ºÅ", yq_cys, yq_cys)]^c^c^pYQ_CHECKCOLOR ^p
+ID_tbyq_findnonortholines   [_Button("ÕÒ³ö²»Õý½»µÄÏß¶Î", yq_bpx, yq_bpx)]^c^c^pYQ_FINDNONORTHOLINES ^p
+ID_tbyq_ucsmatch        [_Button("ÕÒ²»Æ½ÐÐWCSÆ½ÃæÍ¼Ôª", yq_um, yq_um)]^c^c^pYQ_UCSMATCH ^p
+ID_tbyq_checkorthoaxis  [_Button("Ïß¶Î´¹Ö±¼ì²â", yq_bcz, yq_bcz)]^c^c^pYQ_CHECKORTHOAXIS ^p
+[--]
+ID_tbyq_revcloud        [_Button("ÐÞ¶©ÔÆÏß", yq_yx, yq_yx)]^c^c^pYQ_REVCLOUD ^p
+
+**BlockTools
+ID_tbBlockTools         [_Toolbar("Ô´Èª.Í¼¿éÊôÐÔ", _right, _show, 2, 13, 1)]
+ID_tbyq_heaptrees       [_Button("³ÉÆ¬ÇÇ¹àÄ¾", yq_hhs, yq_hhs)]^c^c^pYQ_HEAPTREES ^p
+ID_tbyq_landscape       [_Button("»·¾³·ÖÎö·ûºÅ", yq_hj, yq_hj)]^c^c^pYQ_LANDSCAPE ^p
+[--]
+ID_tbyq_block2bylayer   [_Button("¸ÄÍ¼¿éÄÚÍ¼²ã/ÑÕÉ«", yq_bb0, yq_bb0)]^c^c^pYQ_BLOCK2BYLAYER ^p
+ID_tbyq_blockbasepoint  [_Button("Í¼¿é¸Ä»ùµã", yq_bbi, yq_bbi)]^c^c^pYQ_BLOCKBASEPOINT ^p
+ID_tbyq_block2newname   [_Button("Í¼¿é¸ÄÃû", yq_bbr, yq_bbr)]^c^c^pYQ_BLOCK2NEWNAME ^p
+ID_tbyq_block_batchrename  [_Button("Í¼¿éÅúÁ¿¸ÄÃû", yq_bbg, yq_bbg)]^c^c^pYQ_BLOCK_BATCHRENAME ^p
+ID_tbyq_quickdetailblock   [_Button("¿ìËÙÖÆ×÷´óÑùÍ¼Í¼¿é", yq_bbd, yq_bbd)]^c^c^pYQ_QUICKDETAILBLOCK ^p
+ID_tbyq_blockscale      [_Button("ÉèÖÃÍ¼¿é(Í¼¿ò)±ÈÀý", yq_bbs, yq_bbs)]^c^c^pYQ_BLOCKSCALE ^p
+ID_tbyq_block_writeout  [_Button("ÅúÁ¿µ¼³öÍ¼¿éÎÄ¼þ", yq_bbw, yq_bbw)]^c^c^pYQ_BLOCK_WRITEOUT ^p
+ID_tbyq_replacebydwg    [_Button("ÓÃdwgÌæ´úÍ¼ÖÐ¿é", yq_bbtd, yq_bbtd)]^c^c^pYQ_REPLACEBYDWG ^p
+[--]
+ID_tbyq_quicknewblock   [_Button("¿ìËÙÖÆ×÷Ò»¸öÍ¼¿é", yq_bbn, yq_bbn)]^c^c^pYQ_QUICKNEWBLOCK ^p
+ID_tbyq_block_add       [_Button("ÍùÍ¼¿éÖÐ¼ÓÈëÍ¼Ôª", yq_bba, yq_bba)]^c^c^pYQ_BLOCK_ADD ^p
+ID_tbyq_block_remove    [_Button("É¾³ý¿éÖÐÒ»¸öÍ¼Ôª", yq_bbe, yq_bbe)]^c^c^pYQ_BLOCK_REMOVE ^p
+ID_tbyq_block_copy      [_Button("´ÓÍ¼¿éÖÐ¸´ÖÆÍ¼Ôª", yq_bbc, yq_bbc)]^c^c^pYQ_BLOCK_COPY ^p
+ID_tbyq_blockwipeout    [_Button("Í¼¿é¼Ó¼õÕÚÕÖ", yq_bbzz, yq_bbzz)]^c^c^pYQ_BLOCKWIPEOUT ^p
+[--]
+ID_tbyq_create_minsert  [_Button("ÖÆ×÷ÄäÃû¼ÓÃÜ¿é", yq_bbjm, yq_bbjm)]^c^c^pYQ_CREATE_MINSERT ^p
+ID_tbyq_explode_minsert [_Button("Õ¨ËéÍ¼¿é»òÄäÃû¿é", yq_bbx, yq_bbx)]^c^c^pYQ_EXPLODE_MINSERT ^p
+ID_tbyq_explode_nblock  [_Button("ÍõÕ¨Ç¶Ì×¿é", yq_bbx, yq_bbx)]^c^c^pYQ_EXPLODE_NBLOCK ^p
+[--]
+ID_tbyq_blocktext2att   [_Button("¿éÖÐÎÄ×Ö×ªÎªÊôÐÔ", yq_bbsx, yq_bbsx)]^c^c^pYQ_BLOCKTEXT2ATT ^p
+ID_tbyq_modify_att      [_Button("ÐÞ¸Ä¿éÄÚÊôÐÔÓò", yq_sxg, yq_sxg)]^c^c^pYQ_MODIFY_ATT ^p
+ID_tbyq_increase_att    [_Button("µÝÔö¿éÄÚÊôÐÔÓò", yq_sxz, yq_sxz)]^c^c^pYQ_INCREASE_ATT ^p
+ID_tbyq_changeatts      [_Button("ÅúÁ¿´¦Àí¿éÊôÐÔ", yq_sxc, yq_sxc)]^c^c^pYQ_CHANGEATTS ^p
+ID_tbyq_blockatt2text   [_Button("ÌáÈ¡¿éÄÚÊôÐÔÎªÎÄ×Ö", yq_sxt, yq_sxt)]^c^c^pYQ_BLOCKATT2TEXT ^p
+ID_tbyq_erase_blkatt    [_Button("É¾³ý¿éÄÚÊôÐÔ", yq_sxe, yq_sxe)]^c^c^pYQ_ERASE_BLKATT ^p
+[--]
+ID_tbyq_blocks          [_Button("ÄÚ²¿Í¼¿â", yq_kk, yq_kk)]^c^c^pYQ_BLOCKS ^p
+ID_tbyq_blockviewer     [_Button("Í¼¿â¹ÜÀí", yq_bv, yq_bv)]^c^c^pYQ_BLOCKVIEWER ^p
+ID_tbyq_blockviewer1    [_Button("Í¼¿â¹ÜÀí1", yq_bv, yq_bv)]^c^c^pYQ_BLOCKVIEWER1 ^p
+ID_tbyq_blockviewer2    [_Button("Í¼¿â¹ÜÀí2", yq_bv, yq_bv)]^c^c^pYQ_BLOCKVIEWER2 ^p
+ID_tbyq_blockviewer3    [_Button("Í¼¿â¹ÜÀí3", yq_bv, yq_bv)]^c^c^pYQ_BLOCKVIEWER3 ^p
+
+**HatchingTools
+ID_tbHatchingTools      [_Toolbar("Ô´Èª.Ìî³äÏßÐÍ", _right, _show, 2, 14, 1)]
+ID_tbyq_hatchkeys       [_Button("ÉèÖÃÌî³äÍ¼°¸¿ì½Ý¼ü", yq_hhsc, yq_hhsc)]^c^c^pYQ_HATCHKEYS ^p
+ID_tbyq_hatchingscale   [_Button("ÌØÐÔ.¸ÄÌî³ä¼°±ÈÀý", yq_xtc, yq_xtc)]^c^c^pYQ_HATCHINGSCALE ^p
+ID_tbyq_hatch_quick     [_Button("¿ì½ÝÌî³ä", yq_tc, yq_tc)]^c^c^pYQ_HATCH_QUICK ^p
+ID_tbyq_hatch_match     [_Button("Ñ¡Í¼°¸×÷ÎªÄ£°åÌî³ä", yq_tct, yq_tct)]^c^c^pYQ_HATCH_MATCH ^p
+ID_tbyq_hatch_slide     [_Button("²ÎÊý¼°»ÃµÆÆ¬Ìî³ä", yq_tcc, yq_tcc)]^c^c^pYQ_HATCH_SLIDE ^p
+[--]
+ID_tbyq_hatch_newbase   [_Button("Éè/ÒÆHatch»ù×¼µã", yq_hhi, yq_hhi)]^c^c^pYQ_HATCH_NEWBASE ^p
+ID_tbyq_hatch_angle     [_Button("ÐÞ¸ÄÌî³ä½Ç¶È", yq_hha, yq_hha)]^c^c^pYQ_HATCH_ANGLE ^p
+ID_tbyq_hatch_border    [_Button("ÖØ½¨Ìî³äÍ¼°¸±ß½ç", yq_hhb, yq_hhb)]^c^c^pYQ_HATCH_BORDER ^p
+ID_tbyq_hatch_clipping  [_Button("¼ô²ÃÌî³äÍ¼°¸", yq_hhj, yq_hhj)]^c^c^pYQ_HATCH_CLIPPING ^p
+ID_tbyq_hatch_split     [_Button("²ð·ÖÌî³äÍ¼°¸", yq_hhx, yq_hhx)]^c^c^pYQ_HATCH_SPLIT ^p
+ID_tbyq_hatch_union     [_Button("ºÏ²¢Ìî³äÍ¼°¸", yq_hhu, yq_hhu)]^c^c^pYQ_HATCH_UNION ^p
+ID_tbyq_hatch_disasso   [_Button("È¥³ýÌî³ä¹ØÁª", yq_hhgl, yq_hhgl)]^c^c^pYQ_HATCH_DISASSO ^p
+[--]
+ID_tbyq_fill_wall       [_Button("Ìî³äÇ½¡¢Öù", yq_wwf, yq_wwf)]^c^c^pYQ_FILL_WALL ^p
+[--]
+ID_tbyq_mkpat           [_Button("ÖÆ×÷HatchÍ¼°¸1mm", yq_mp, yq_mp)]^c^c^pYQ_MKPAT ^p
+ID_tbyq_mkpat1          [_Button("ÖÆ×÷HatchÍ¼°¸", yq_mp1, yq_mp1)]^c^c^pYQ_MKPAT1 ^p
+ID_tbyq_mkpat_byhatch   [_Button("ÌáÈ¡ÖÆ×÷Ìî³äÍ¼°¸", yq_mpp, yq_mpp)]^c^c^pYQ_MKPAT_BYHATCH ^p
+[--]
+ID_tbyq_ltypekeys       [_Button("ÉèÖÃÏßÐÍ¿ì½Ý¼ü(²»´¦Àí¿éÄÚÍ¼Ôª)", yq_ltsc, yq_ltsc)]^c^c^pYQ_LTYPEKEYS ^p
+ID_tbyq_ltscale         [_Button("ÐÞ¸ÄÏßÐÍ¼°±ÈÀý", yq_xt, yq_xt)]^c^c^pYQ_LTSCALE ^p
+ID_tbyq_ltswitch        [_Button("ÇÐ»»ÏßÐÍ(´¦Àí¿éÄÚÍ¼Ôª)", yq_xts, yq_xts)]^c^c^pYQ_LTSWITCH ^p
+ID_tbyq_putltscale      [_Button("Ìæ»»Í¬ÏßÐÍ±ÈÀý", yq_plts, yq_plts)]^c^c^pYQ_PUTLTSCALE ^p
+ID_tbyq_mklinetype      [_Button("ÖÆ×÷×Ö·ûÏßÐÍ", yq_mlt, yq_mlt)]^c^c^pYQ_MKLINETYPE ^p
+ID_tbyq_loadlinetype    [_Button("ÔØÈëÏßÐÍ", yq_llt, yq_llt)]^c^c^pYQ_LOADLINETYPE ^p
+
+**LayerTools
+ID_tbLayerTools         [_Toolbar("Ô´Èª.Í¼²ã¹¤¾ß", _right, _show, 2, 15, 1)]
+ID_tyq_layer_2current   [_Button("Ñ¡Í¼Ôª¸Äµ½µ±Ç°²ã", yq_erc, yq_erc)]^c^c^pYQ_LAYER_2CURRENT ^p
+ID_tbyq_layer_new       [_Button("ÐÂ½¨Í¼²ã", yq_ern, yq_ern)]^c^c^pYQ_LAYER_NEW ^p
+ID_tbyq_layer_current   [_Button("Éè¶¨µ±Ç°Í¼²ã", yq_ers, yq_ers)]^c^c^pYQ_LAYER_CURRENT ^p
+ID_tbyq_layer_saverestore    [_Button("±£´æ»Ö¸´Í¼²ã¿ª¹Ø×´Ì¬", yq_err, yq_err)]^c^c^pYQ_LAYER_SAVERESTORE ^p
+[--]
+ID_tbyq_layer_iso       [_Button("¹Ø±Õ·ÇÑ¡Í¼²ã", yq_erd, yq_erd)]^c^c^pYQ_LAYER_ISO ^p
+ID_tbyq_layer_off       [_Button("¹Ø±ÕÍ¼²ã", yq_erf, yq_erf)]^c^c^pYQ_LAYER_OFF ^p
+ID_tbyq_layer_off_all   [_Button("¹Ø±ÕÈ«²¿Í¼²ã", yq_eraf, yq_eraf)]^c^c^pYQ_LAYER_OFF_ALL ^p
+ID_tbyq_layer_on        [_Button("´ò¿ªÍ¼²ã", yq_era, yq_era)]^c^c^pYQ_LAYER_ON ^p
+ID_tbyq_layer_on_all    [_Button("´ò¿ªÈ«²¿Í¼²ã", yq_eraa, yq_eraa)]^c^c^pYQ_LAYER_ON_ALL ^p
+ID_tbyq_layer_on2off    [_Button("ÇÐ»»È«²¿Í¼²ã¿ª¹Ø", yq_erv, yq_erv)]^c^c^pYQ_LAYER_ON2OFF ^p
+[--]
+ID_tbyq_layer_lock      [_Button("Ëø¶¨Í¼²ã", yq_erl, yq_erl)]^c^c^pYQ_LAYER_LOCK ^p
+ID_tbyq_layer_iso_lock  [_Button("Ëø¶¨·ÇÑ¡Í¼²ã", yq_erdl, yq_erdl)]^c^c^pYQ_LAYER_ISO_LOCK ^p
+ID_tbyq_layer_unlock    [_Button("½âËøÍ¼²ã", yq_eru, yq_eru)]^c^c^pYQ_LAYER_UNLOCK ^p
+[--]
+ID_tbyq_layer_freeze    [_Button("¶³½áÍ¼²ã", yq_erz, yq_erz)]^c^c^pYQ_LAYER_FREEZE ^p
+ID_tbyq_layer_iso_freeze    [_Button("¶³½á·ÇÑ¡Í¼²ã", yq_erdz, yq_erdz)]^c^c^pYQ_LAYER_ISO_FREEZE ^p
+ID_tbyq_layer_thaw      [_Button("½â¶³Í¼²ã", yq_ert, yq_ert)]^c^c^pYQ_LAYER_THAW ^p
+[--]
+ID_tbyq_layer_noff      [_Button("¹Ø±Õ¿éÄÚÍ¼²ã", yq_erbf, yq_erbf)]^c^c^pYQ_LAYER_NOFF ^p
+ID_tbyq_layer_nfreeze   [_Button("¶³½á¿éÄÚÍ¼²ã", yq_erbz, yq_erbz)]^c^c^pYQ_LAYER_NFREEZE ^p
+ID_tbyq_layer_showall   [_Button("½â¶³/½âËø/´ò¿ªÈ«²¿Í¼²ã", yq_erer, yq_erer)]^c^c^pYQ_LAYER_SHOWALL ^p
+[--]
+ID_tbyq_layer_replace   [_Button("ÅúÁ¿Ìæ»»Í¼²ã", yq_ertd, yq_ertd)]^c^c^pYQ_LAYER_REPLACE ^p
+ID_tbyq_layer_batchrename    [_Button("Í¼²ãÅúÁ¿¸ÄÃû", yq_erg, yq_erg)]^c^c^pYQ_LAYER_BATCHRENAME ^p
+ID_tbyq_merge_layer     [_Button("ºÏ²¢Í¼²ã", yq_erm, yq_erm)]^c^c^pYQ_MERGE_LAYER ^p
+ID_tbyq_formlaybycolor  [_Button("°´Í¼ÔªÑÕÉ«ÖØÐÂ·Ö²ã", yq_c2er, yq_c2er)]^c^c^pYQ_FORMLAYBYCOLOR ^p
+ID_tbyq_layerkeys       [_Button("ÉèÖÃ×ª»»Í¼²ã¿ì½Ý¼ü", yq_erk, yq_erk)]^c^c^pYQ_LAYERKEYS ^p
+ID_tbyq_colorkeys       [_Button("ÉèÖÃ×ª»»ÑÕÉ«¿ì½Ý¼ü", yq_erk, yq_erk)]^c^c^pYQ_COLORKEYS ^p
+[--]
+ID_tbyq_outputlayers    [_Button("µ¼³öÍ¼²ãÎÄ¼þ", yq_ero, yq_ero)]^c^c^pYQ_OUTPUTLAYERS ^p
+ID_tbyq_inputlayers     [_Button("µ¼ÈëÍ¼²ãÎÄ¼þ", yq_eri, yq_eri)]^c^c^pYQ_INPUTLAYERS ^p
+
+**ViewportTools
+ID_tbViewportTools          [_Toolbar("Ô´Èª.ÊÓ¿Ú²¼¾Ö", _right, _show, 2, 16, 1)]
+ID_tbyq_vplayer_manager     [_Button("¹ÜÀíÊÓ¿ÚÍ¼²ã", yq_vvc, yq_vvc)]^c^c^pYQ_VPLAYER_MANAGER ^p
+ID_tbyq_vplayer_freeze      [_Button("¶³½áÊÓ¿ÚÍ¼²ã", yq_vvz, yq_vvz)]^c^c^pYQ_VPLAYER_FREEZE ^p
+ID_tbyq_vplayer_nfreeze     [_Button("¶³½áÊÓ¿Ú¿éÄÚÍ¼²ã", yq_vvbz, yq_vvbz)]^c^c^pYQ_VPLAYER_NFREEZE ^p
+ID_tbyq_vplayer_thaw        [_Button("½â¶³ÊÓ¿ÚÍ¼²ã", yq_vvt, yq_vvt)]^c^c^pYQ_VPLAYER_THAW ^p
+ID_tbyq_vplayer_iso         [_Button("¸ôÀëÊÓ¿ÚÍ¼²ã", yq_vvdz, yq_vvdz)]^c^c^pYQ_VPLAYER_ISO ^p
+ID_tbyq_vplayer_isoall      [_Button("¸ôÀëÆäËûÊÓ¿ÚÍ¼²ã", yq_vvzz, yq_vvzz)]^c^c^pYQ_VPLAYER_ISOALL ^p
+ID_tbyq_vplayer_gray        [_Button("ÊÓ¿ÚÍ¼²ã±äÉ«", yq_vvh, yq_vvh)]^c^c^pYQ_VPLAYER_GRAY ^p
+ID_tbyq_vplayer_recover     [_Button("»¹Ô­ÊÓ¿Ú²ãÑÕÉ«", yq_vvhf, yq_vvhf)]^c^c^pYQ_VPLAYER_RECOVER ^p
+[--]
+ID_tbyq_viewport_new        [_Button("ÐÂ½¨ÊÓ¿Ú", yq_vvn, yq_vvn)]^c^c^pYQ_VIEWPORT_NEW ^p
+ID_tbyq_viewport_split      [_Button("²ð·ÖÊÓ¿Ú", yq_vv2, yq_vv2)]^c^c^pYQ_VIEWPORT_SPLIT ^p
+ID_tbyq_model2viewport      [_Button("Ä£ÐÍ·¶Î§ÐÂ½¨ÊÓ¿Ú", yq_mvv, yq_mvv)]^c^c^pYQ_MODEL2VIEWPORT ^p
+ID_tbyq_curve2viewport      [_Button("±ÕºÏÇúÏß±äÊÓ¿Ú", yq_xxvv, yq_xxvv)]^c^c^pYQ_CURVE2VIEWPORT ^p
+ID_tbyq_viewport_scale      [_Button("Éè¶¨ÊÓ¿Ú±ÈÀý", yq_vvs, yq_vvs)]^c^c^pYQ_VIEWPORT_SCALE ^p
+ID_tbyq_scalevps            [_Button("Ëõ·ÅÊÓ¿ÚÍâ¿ò¼°±ÈÀý", yq_vvsc, yq_vvsc)]^c^c^pYQ_SCALEVPS ^p
+ID_tbyq_viewport_sync       [_Button("¶ÔÆëÊÓ¿ÚÄÚÈÝ", yq_vvdq, yq_vvdq)]^c^c^pYQ_VIEWPORT_SYNC ^p
+ID_tbyq_viewport_pan        [_Button("Æ½ÒÆÊÓ¿ÚÊÓÍ¼", yq_vvp, yq_vvp)]^c^c^pYQ_VIEWPORT_PAN ^p
+[--]
+ID_tbyq_viewport_lock       [_Button("Ëø¶¨ÊÓ¿Ú", yq_vvl, yq_vvl)]^c^c^pYQ_VIEWPORT_LOCK ^p
+ID_tbyq_viewport_lock_all   [_Button("Ëø¶¨È«²¿ÊÓ¿Ú", yq_vval, yq_vval)]^c^c^pYQ_VIEWPORT_LOCK_ALL ^p
+ID_tbyq_viewport_unlock     [_Button("½âËøÊÓ¿Ú", yq_vvu, yq_vvu)]^c^c^pYQ_VIEWPORT_UNLOCK ^p
+ID_tbyq_viewport_unlock_all [_Button("½âËøÈ«²¿ÊÓ¿Ú", yq_vvau, yq_vvau)]^c^c^pYQ_VIEWPORT_UNLOCK_ALL ^p
+[--]
+ID_tbyq_viewport_off        [_Button("¹Ø±ÕÊÓ¿Ú", yq_vvf, yq_vvf)]^c^c^pYQ_VIEWPORT_OFF ^p
+ID_tbyq_viewport_off_all    [_Button("¹Ø±ÕÈ«²¿ÊÓ¿Ú", yq_vvaf, yq_vvaf)]^c^c^pYQ_VIEWPORT_OFF_ALL ^p
+ID_tbyq_viewport_on         [_Button("´ò¿ªÊÓ¿Ú", yq_vva, yq_vva)]^c^c^pYQ_VIEWPORT_ON ^p
+ID_tbyq_viewport_on_all     [_Button("´ò¿ªÈ«²¿ÊÓ¿Ú", yq_vvaa, yq_vvaa)]^c^c^pYQ_VIEWPORT_ON_ALL ^p
+[--]
+ID_tbyq_viewport2pspace     [_Button("ÊÓ¿Ú×ª²¼¾Ö¿é", yq_vvbb, yq_vvbb)]^c^c^pYQ_VIEWPORT2PSPACE ^p
+[--]
+ID_tbyq_layout_batchrename  [_Button("²¼¾ÖÅúÁ¿¸ÄÃû", yq_tzg, yq_tzg)]^c^c^pYQ_LAYOUT_BATCHRENAME ^p
+ID_tbyq_frames2layouts      [_Button("Ñ¡Í¼¿ò²ð·ÖÎª²¼¾Ö", yq_tzf, yq_tzf)]^c^c^pYQ_FRAMES2LAYOUTS ^p
+ID_tbyq_framedivided        [_Button("Í¼Ö½»æÍ¼Çø·Ö¸î", yq_tzfg, yq_tzfg)]^c^c^pYQ_FRAMEDIVIDED ^p
+[--]
+ID_tbyq_ucsdir          [_Button("Ðý×ªÁ¢ÃæÊÓÍ¼4·½Ïò", yq_vvd, yq_vvd)]^c^c^pYQ_UCSDIR ^p
+ID_tbyq_snapshot        [_Button("ÊÓÍ¼¿ìÕÕ", yq_kz, yq_kz)]^c^c^pYQ_SNAPSHOT ^p
+ID_tbyq_hyperlink       [_Button("³¬Á´½Ó¼°ÊÓÍ¼¹ÜÀí", yq_clj, yq_clj)]^c^c^pYQ_HYPERLINK ^p
+
+**MatchTools
+ID_tbMatchTools         [_Toolbar("Ô´Èª.ÌØÐÔË¢×Ó", _right, _show, 2, 17, 1)]
+ID_tbyq_match_block     [_Button("Ë¢×Ó.Æ¥Åä/Ìæ»»Í¼¿é", yq_ssb, yq_ssb)]^c^c^pYQ_MATCH_BLOCK ^p
+ID_tbyq_match_dynprops  [_Button("Ë¢×Ó.Æ¥Åä¶¯Ì¬¿éÊôÐÔ", yq_ssd, yq_ssd)]^c^c^pYQ_MATCH_DYNPROPS ^p
+ID_tbyq_match_rotation  [_Button("Ë¢×Ó.Æ¥ÅäÐý×ª½Ç¶È", yq_ssrt, yq_ssrt)]^c^c^pYQ_MATCH_ROTATION ^p
+[--]
+ID_tbyq_match_layer     [_Button("Ë¢×Ó.Æ¥ÅäÍ¼²ã", yq_sser, yq_sser)]^c^c^pYQ_MATCH_LAYER ^p
+ID_tbyq_match_color     [_Button("Ë¢×Ó.Æ¥ÅäÑÕÉ«", yq_ssc, yq_ssc)]^c^c^pYQ_MATCH_COLOR ^p
+ID_tbyq_match_layercolor    [_Button("Ë¢×Ó.Æ¥ÅäÍ¼²ãÓëÑÕÉ«", yq_sscc, yq_sscc)]^c^c^pYQ_MATCH_LAYERCOLOR ^p
+ID_tbyq_match_vplayer   [_Button("Ë¢×Ó.Æ¥ÅäÊÓ¿ÚÍ¼²ã", yq_ssvv, yq_ssvv)]^c^c^pYQ_MATCH_VPLAYER ^p
+[--]
+ID_tbyq_match_content   [_Button("Ë¢×Ó.Æ¥ÅäÎÄ×ÖÄÚÈÝ", yq_sst, yq_sst)]^c^c^pYQ_MATCH_CONTENT ^p
+ID_tbyq_match_style     [_Button("Ë¢×Ó.Æ¥ÅäÎÄ×ÖÑùÊ½", yq_ssst, yq_ssst)]^c^c^pYQ_MATCH_STYLE ^p
+ID_tbyq_match_textheight   [_Button("Ë¢×Ó.Æ¥ÅäÎÄ×Ö¸ß¶È", yq_ssh, yq_ssh)]^c^c^pYQ_MATCH_TEXTHEIGHT ^p
+[--]
+ID_tbyq_match_width     [_Button("Ë¢×Ó.¶à¶ÎÏß¿í¶È", yq_ssw, yq_ssw)]^c^c^pYQ_MATCH_WIDTH ^p
+ID_tbyq_match_linetype  [_Button("Ë¢×Ó.Æ¥ÅäÏßÐÍ", yq_ssxt, yq_ssxt)]^c^c^pYQ_MATCH_LINETYPE ^p
+ID_tbyq_match_thickness [_Button("Ë¢×Ó.Æ¥ÅäÊúÏòºñ¶È", yq_ssth, yq_ssth)]^c^c^pYQ_MATCH_THICKNESS ^p
+
+**OtherTools
+ID_tbOtherTools         [_Toolbar("Ô´Èª.ÆäËû¹¤¾ß", _right, _show, 2, 18, 1)]
+ID_tbyq_batchplot       [_Button("Ñ¡Í¼¿òÅúÁ¿´òÓ¡", yq_bp, yq_bp)]^c^c^pYQ_BATCHPLOT ^p
+[--]
+ID_tbyq_catalog         [_Button("±àÖÆÍ¼Ö½Ä¿Â¼", yq_dwgl, yq_dwgl)]^c^c^pYQ_CATALOG ^p
+ID_tbyd_outputdwgs      [_Button("Ñ¡Í¼¿ò¹éµµÍ¼Ö½", yq_dwgs, yq_dwgs)]^c^c^pYQ_OUTPUTDWGS ^p
+ID_tbyq_arrangedwgs     [_Button("ÅÅÁÐºÏ²¢Í¼µµ", yq_dwga, yq_dwga)]^c^c^pYQ_ARRANGEDWGS ^p
+[--]
+ID_tbyq_hideselect      [_Button("Òþ²ØÑ¡ÔñÍ¼Ôª", yq_eef, yq_eef)]^c^c^pYQ_HIDESELECT ^p
+ID_tbyq_hideunselect    [_Button("Òþ²Ø·ÇÑ¡ÔñÍ¼Ôª", yq_eed, yq_eed)]^c^c^pYQ_HIDEUNSELECT ^p
+ID_tbyq_displayhide     [_Button("ÏÔÊ¾È«²¿Òþ²ØÍ¼Ôª", yq_eea, yq_eea)]^c^c^pYQ_DISPLAYHIDE ^p
+ID_tbyq_displayall      [_Button("Ç¿ÖÆÏÔÊ¾È«²¿Í¼Ôª", yq_eeaa, yq_eeaa)]^c^c^pYQ_DISPLAYALL ^p
+[--]
+ID_tbyq_quickgroup      [_Button("¿ìËÙÖÆ×÷Ò»¸ö±à×é", yq_ggn, yq_ggn)]^c^c^pYQ_QUICKGROUP ^p
+ID_tbyq_explodegroup    [_Button("½âÉ¢Ò»¸ö±à×é", yq_ggx, yq_ggx)]^c^c^pYQ_EXPLODEGROUP ^p
+ID_tbyq_group_add       [_Button("¼ÓÈëÒ»¸ö±à×é", yq_gga, yq_gga)]^c^c^pYQ_GROUP_ADD ^p
+ID_tbyq_group_remove    [_Button("É¾³ý±à×éÖÐÍ¼Ôª", yq_gge, yq_gge)]^c^c^pYQ_GROUP_REMOVE ^p
+ID_tbyq_group_separate  [_Button("´Ó±à×éÖÐ·ÖÀëÍ¼Ôª", yq_ggs, yq_ggs)]^c^c^pYQ_GROUP_SEPARATE ^p
+ID_tbyq_purgegroup      [_Button("Çå³ýÎÞÓÃ±à×é", yq_ggp, yq_ggp)]^c^c^pYQ_PURGEGROUP ^p
+[--]
+ID_tbyq_switch_dynamic  [_Button("ÇÐ»»ÊÇ·ñÊ¹ÓÃ¶¯Ì¬", yq_dtyq, yq_dtyq)]^c^c^pYQ_SWITCH_DYNAMIC ^p
+ID_tbyq_drawclipboard   [_Button("»­³öExcelÕ³Ìù°å×ø±ê", yq_ztb, yq_ztb)]^c^c^pYQ_DRAWCLIPBOARD ^p
+ID_tbyq_acad2kml        [_Button("Êä³öµ½¹È¸èµØÇò", yq_a2k, yq_a2k)]^c^c^pYQ_ACAD2KML ^P
+[--]
+ID_tbyq_commandfinder   [_Button("Ô´ÈªÉè¼ÆÃüÁî²éÕÒ", yq_zml, yq_zml)]^c^c^pYQ_COMMANDFINDER ^P
+ID_tbyq_lastyqcmd       [_Button("ÖØ¸´ÉÏÒ»¸öÔ´ÈªÃüÁî", yq_q, yq_q)]^c^c^pYQ_LASTYQCMD ^P
+[--]
