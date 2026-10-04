@@ -3,7 +3,7 @@
 ;;; =========================================================================
 
 ;; 1. Global Version (قم بزيادة هذا الرقم كلما أضفت أوامر جديدة)
-(setq *AH-VER* "1.0")
+(setq *AH-VER* "1.1")
 
 ;; -------------------------------------------------------------------------
 ;; 2. Your Custom Commands & LISP Tools
@@ -1895,20 +1895,45 @@
   blocked
 )
 
-(defun HCOL:CreateSolidHatch (colObj modelSpace / hatchObj sa vArr ok)
+(defun HCOL:CreateSolidHatch (colObj modelSpace / hatchObj sa vArr ok doc layers hatchLayer)
+  ;; Dedicated layer for HCOL solid hatches.
+  ;; The column remains on its original layer.
+  (setq doc (vla-get-ActiveDocument (vlax-get-acad-object)))
+  (setq layers (vla-get-Layers doc))
+
+  ;; Get SH-COLUMN; create it automatically if it does not exist.
+  (setq hatchLayer
+        (vl-catch-all-apply 'vla-Item (list layers "SH-COLUMN")))
+  (if (vl-catch-all-error-p hatchLayer)
+      (setq hatchLayer
+            (vl-catch-all-apply 'vla-Add (list layers "SH-COLUMN")))
+  )
+
   (setq hatchObj
         (vl-catch-all-apply
           'vla-AddHatch
           (list modelSpace 1 "SOLID" :vlax-false)))   ; 1 = acPreDefined
+
   (if (and hatchObj (not (vl-catch-all-error-p hatchObj)))
       (progn
         (setq sa (vlax-make-safearray vlax-vbObject (cons 0 0)))
         (vlax-safearray-fill sa (list colObj))
-        (setq vArr (vlax-make-variant sa (logior vlax-vbarray vlax-vbobject)))
-        (setq ok (vl-catch-all-apply 'vla-AppendOuterLoop (list hatchObj vArr)))
+        (setq vArr
+              (vlax-make-variant
+                sa
+                (logior vlax-vbarray vlax-vbobject)))
+
+        (setq ok
+              (vl-catch-all-apply
+                'vla-AppendOuterLoop
+                (list hatchObj vArr)))
+
         (if (not (vl-catch-all-error-p ok))
             (progn
-              (vl-catch-all-apply 'vla-put-Layer (list hatchObj (vla-get-Layer colObj)))
+              ;; Put every new HCOL hatch on SH-COLUMN.
+              (vl-catch-all-apply
+                'vla-put-Layer
+                (list hatchObj "SH-COLUMN"))
               (vl-catch-all-apply 'vla-Evaluate (list hatchObj))
             )
             (vl-catch-all-apply 'vla-Delete (list hatchObj))
@@ -2267,9 +2292,4 @@
 )
 
 (princ "\nHCOL loaded. Type HCOL to run.")
-(princ)
-
-
-
-(princ "\n[AH Tools] Custom tools loaded successfully.")
 (princ)
