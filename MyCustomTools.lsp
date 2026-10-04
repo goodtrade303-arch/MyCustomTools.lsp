@@ -3,7 +3,7 @@
 ;;; =========================================================================
 
 ;; 1. Global Version (قم بزيادة هذا الرقم كلما أضفت أوامر جديدة)
-(setq *AH-VER* "1.1")
+(setq *AH-VER* "1.0")
 
 ;; -------------------------------------------------------------------------
 ;; 2. Your Custom Commands & LISP Tools
@@ -1649,7 +1649,7 @@
 ;;;    3) For every valid (closed) old column:
 ;;;         - create an exact duplicate (same shape/size/location) via
 ;;;           vla-Copy - this duplicate is the new column boundary.
-;;;         - fill the duplicate with a SOLID hatch.
+;;;         - fill the duplicate with a ANSI37 hatch.
 ;;;         - for every wall, find exact intersection points with the
 ;;;           duplicate boundary (IntersectWith, acExtendNone = 0), split
 ;;;           the wall into ordered sub-segments.
@@ -1920,7 +1920,7 @@
 ;; ----------------------------------------------------------------------------
 ;; Put an object below another object using AutoCAD's SortentsTable.
 ;; This is the ActiveX equivalent of DRAWORDER -> Move Below and avoids
-;; COMMAND/PEDIT completely. Here it is used so the SOLID hatch stays below
+;; COMMAND/PEDIT completely. Here it is used so the ANSI37 hatch stays below
 ;; the column boundary, making the boundary clearly visible on top.
 ;; ----------------------------------------------------------------------------
 (defun HCOL:PutObjectBelow (obj target owner / extDict sortObj arr res)
@@ -1958,7 +1958,7 @@
   )
 )
 
-(defun HCOL:CreateSolidHatch (colObj modelSpace / hatchObj sa vArr ok doc layers hatchLayer)
+(defun HCOL:CreateANSI37Hatch (colObj modelSpace / hatchObj sa vArr ok doc layers hatchLayer)
   ;; Dedicated layer for HCOL solid hatches.
   ;; The column remains on its original layer.
   (setq doc (vla-get-ActiveDocument (vlax-get-acad-object)))
@@ -1975,7 +1975,7 @@
   (setq hatchObj
         (vl-catch-all-apply
           'vla-AddHatch
-          (list modelSpace 1 "SOLID" :vlax-false)))   ; 1 = acPreDefined
+          (list modelSpace 1 "ANSI37" :vlax-false)))   ; 1 = acPreDefined
 
   (if (and hatchObj (not (vl-catch-all-error-p hatchObj)))
       (progn
@@ -1997,6 +1997,12 @@
               (vl-catch-all-apply
                 'vla-put-Layer
                 (list hatchObj "SH-COLUMN"))
+
+              ;; ANSI37 settings.  Pattern scale is left at 1.0 so the
+              ;; hatch follows the drawing units naturally; change this
+              ;; value later if a denser/looser pattern is desired.
+              (vl-catch-all-apply 'vla-put-PatternScale (list hatchObj 1.0))
+              (vl-catch-all-apply 'vla-put-PatternAngle (list hatchObj 0.0))
               (vl-catch-all-apply 'vla-Evaluate (list hatchObj))
 
               ;; IMPORTANT: keep the hatch BELOW its column boundary.
@@ -2195,7 +2201,7 @@
   ;; -------------------------------------------------------------------
   (setq hatchCount 0)
   (foreach cd colData
-    (setq res (HCOL:CreateSolidHatch (car cd) modelSpace))
+    (setq res (HCOL:CreateANSI37Hatch (car cd) modelSpace))
     (if (and res (not (vl-catch-all-error-p res)))
         (setq hatchCount (1+ hatchCount))
     )
