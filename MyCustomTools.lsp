@@ -3,7 +3,7 @@
 ;;; =========================================================================
 
 ;; 1. Global Version (قم بزيادة هذا الرقم كلما أضفت أوامر جديدة)
-(setq *AH-VER* "1.0")
+(setq *AH-VER* "1.1")
 
 ;; -------------------------------------------------------------------------
 ;; 2. Your Custom Commands & LISP Tools
@@ -1649,7 +1649,7 @@
 ;;;    3) For every valid (closed) old column:
 ;;;         - create an exact duplicate (same shape/size/location) via
 ;;;           vla-Copy - this duplicate is the new column boundary.
-;;;         - fill the duplicate with a ANSI37 hatch.
+;;;         - use the duplicate boundary as the exact cutting boundary.
 ;;;         - for every wall, find exact intersection points with the
 ;;;           duplicate boundary (IntersectWith, acExtendNone = 0), split
 ;;;           the wall into ordered sub-segments.
@@ -1674,7 +1674,10 @@
 ;;;           detected and discarded whole.
 ;;;         - the original (now replaced) wall entities are deleted.
 ;;;         - the original old column is deleted, leaving only the new
-;;;           duplicate + its hatch.
+;;;           duplicate.
+;;;         - any old HATCH inside/overlapping the column boundary is deleted.
+;;;         - ANSI37 is created on SH-COLUMN as the FINAL operation; the
+;;;           duplicate boundary is kept above the hatch.
 ;;;    4) Whole process wrapped in one Undo Group, and a message box
 ;;;       (alert) at the end reports exactly what was done, so nothing
 ;;;       is missed even if the command-line history isn't checked.
@@ -1682,13 +1685,27 @@
 
 (vl-load-com)
 
+(setq *HCOL-DOC* nil)
 (setq *HCOL-TOL* 0.001)          ; precision tolerance for the actual cutting
 (setq *HCOL-CLOSE-TOL* 0.01)     ; looser tolerance (1 cm) just for deciding
                                   ; whether a manually-closed polyline counts
                                   ; as closed (hand-snapping is rarely sub-mm)
 
 ;; ----------------------------------------------------------------------------
-;; Error handler - guarantees the undo group is always closed.
+;; Undo helpers - ActiveX only (avoids COMMAND nesting/order errors).
+;; ----------------------------------------------------------------------------
+(defun HCOL:StartUndo ()
+  (if *HCOL-DOC*
+      (vl-catch-all-apply 'vla-StartUndoMark (list *HCOL-DOC*)))
+)
+
+(defun HCOL:EndUndo ()
+  (if *HCOL-DOC*
+      (vl-catch-all-apply 'vla-EndUndoMark (list *HCOL-DOC*)))
+)
+
+;; ----------------------------------------------------------------------------
+;; Error handler - guarantees the undo mark is closed.
 ;; ----------------------------------------------------------------------------
 (defun HCOL:ErrorHandler (msg)
   (if (and msg
@@ -1696,13 +1713,8 @@
            (/= msg "quit / exit abort"))
       (princ (strcat "\nHCOL error: " msg))
   )
+  (HCOL:EndUndo)
   (if *HCOL-OLD-ERROR* (setq *error* *HCOL-OLD-ERROR*))
-  ;; Never call (command) from the error handler.
-  ;; End the undo mark through ActiveX instead.
-  (if *HCOL-DOC*
-      (vl-catch-all-apply 'vla-EndUndoMark (list *HCOL-DOC*))
-  )
-  (setq *HCOL-DOC* nil)
   (if *HCOL-OLD-CMDECHO* (setvar "cmdecho" *HCOL-OLD-CMDECHO*))
   (princ)
 )
@@ -1918,104 +1930,223 @@
 )
 
 ;; ----------------------------------------------------------------------------
-;; Put an object below another object using AutoCAD's SortentsTable.
-;; This is the ActiveX equivalent of DRAWORDER -> Move Below and avoids
-;; COMMAND/PEDIT completely. Here it is used so the ANSI37 hatch stays below
-;; the column boundary, making the boundary clearly visible on top.
+;; Ensure the dedicated column-hatch layer exists.
 ;; ----------------------------------------------------------------------------
-(defun HCOL:PutObjectBelow (obj target owner / extDict sortObj arr res)
-  (setq extDict
-        (vl-catch-all-apply 'vla-GetExtensionDictionary (list owner)))
-  (if (vl-catch-all-error-p extDict)
+(defun HCOL:EnsureHatchLayer (doc / layers lay)
+  (setq layers (vla-get-Layers doc))
+  (setq lay (vl-catch-all-apply 'vla-Item (list layers "SH-COLUMN")))
+  (if (vl-catch-all-error-p lay)
+      (setq lay (vla-Add layers "SH-COLUMN"))
+  )
+  lay
+)
+
+;; ----------------------------------------------------------------------------
+;; Delete existing HATCH entities whose extents/geometry fall inside or
+;; intersect any of the supplied column boundaries. This runs BEFORE the
+;; final ANSI37 hatch is created, so old hatch never remains underneath it.
+;; ----------------------------------------------------------------------------
+(defun HCOL:AnyIntersectionP (obj1 obj2 / res lst tmp)
+  (setq res (vl-catch-all-apply 'vlax-invoke (list obj1 'IntersectWith obj2 0)))
+  (if (or (null res) (vl-catch-all-error-p res))
       nil
-      (progn
-        (setq sortObj
-              (vl-catch-all-apply
-                'vla-GetObject
-                (list extDict "ACAD_SORTENTS")))
-
-        ;; Create the SortentsTable if this space does not have one yet.
-        (if (vl-catch-all-error-p sortObj)
-            (setq sortObj
-                  (vl-catch-all-apply
-                    'vla-AddObject
-                    (list extDict "ACAD_SORTENTS" "AcDbSortentsTable")))
-        )
-
-        (if (vl-catch-all-error-p sortObj)
-            nil
-            (progn
-              (setq arr (vlax-make-safearray vlax-vbObject '(0 . 0)))
-              (vlax-safearray-put-element arr 0 obj)
-              (setq res
-                    (vl-catch-all-apply
-                      'vla-MoveBelow
-                      (list sortObj arr target)))
-              (not (vl-catch-all-error-p res))
-            )
+      (cond
+        ((listp res) (> (length res) 0))
+        (T
+         (setq tmp (vl-catch-all-apply 'vlax-safearray->list (list res)))
+         (if (not (vl-catch-all-error-p tmp))
+             (> (length tmp) 0)
+             (progn
+               (setq tmp (vl-catch-all-apply 'vlax-variant-value (list res)))
+               (if (vl-catch-all-error-p tmp)
+                   nil
+                   (progn
+                     (setq tmp (vl-catch-all-apply 'vlax-safearray->list (list tmp)))
+                     (and (not (vl-catch-all-error-p tmp)) (> (length tmp) 0))
+                   )
+               )
+             )
+         )
         )
       )
   )
 )
 
-(defun HCOL:CreateANSI37Hatch (colObj modelSpace / hatchObj sa vArr ok doc layers hatchLayer)
-  ;; Dedicated layer for HCOL solid hatches.
-  ;; The column remains on its original layer.
-  (setq doc (vla-get-ActiveDocument (vlax-get-acad-object)))
-  (setq layers (vla-get-Layers doc))
-
-  ;; Get SH-COLUMN; create it automatically if it does not exist.
-  (setq hatchLayer
-        (vl-catch-all-apply 'vla-Item (list layers "SH-COLUMN")))
-  (if (vl-catch-all-error-p hatchLayer)
-      (setq hatchLayer
-            (vl-catch-all-apply 'vla-Add (list layers "SH-COLUMN")))
+(defun HCOL:ToPointList (x / a b)
+  ;; GetBoundingBox / COM calls can return either a raw SAFEARRAY or a
+  ;; VARIANT containing a SAFEARRAY, depending on AutoCAD/Visual LISP build.
+  ;; Never call vlax-variant-value on a raw SAFEARRAY: that is exactly what
+  ;; causes "bad argument type: variantp #<safearray...>".
+  (cond
+    ((listp x) x)
+    (T
+     (setq a (vl-catch-all-apply 'vlax-safearray->list (list x)))
+     (if (not (vl-catch-all-error-p a))
+         a
+         (progn
+           (setq b (vl-catch-all-apply 'vlax-variant-value (list x)))
+           (if (vl-catch-all-error-p b)
+               nil
+               (progn
+                 (setq a (vl-catch-all-apply 'vlax-safearray->list (list b)))
+                 (if (vl-catch-all-error-p a) nil a)
+               )
+           )
+         )
+     )
+    )
   )
+)
 
-  (setq hatchObj
-        (vl-catch-all-apply
-          'vla-AddHatch
-          (list modelSpace 1 "ANSI37" :vlax-false)))   ; 1 = acPreDefined
+(defun HCOL:HatchTouchesColumnP (hatchObj cd / colObj poly mn mx pts p hit bbRes bb1 bb2)
+  (setq colObj (car cd))
+  (setq poly   (cdr cd))
+  (setq hit nil)
 
-  (if (and hatchObj (not (vl-catch-all-error-p hatchObj)))
+  ;; 1) Bounding-box center/corners inside the column.
+  ;; Handle BOTH raw SAFEARRAY and VARIANT return forms from GetBoundingBox.
+  (setq bbRes (vl-catch-all-apply 'vla-GetBoundingBox (list hatchObj 'bb1 'bb2)))
+  (if (not (vl-catch-all-error-p bbRes))
       (progn
-        (setq sa (vlax-make-safearray vlax-vbObject (cons 0 0)))
-        (vlax-safearray-fill sa (list colObj))
-        (setq vArr
-              (vlax-make-variant
-                sa
-                (logior vlax-vbarray vlax-vbobject)))
-
-        (setq ok
-              (vl-catch-all-apply
-                'vla-AppendOuterLoop
-                (list hatchObj vArr)))
-
-        (if (not (vl-catch-all-error-p ok))
+        (setq mn (HCOL:ToPointList bb1))
+        (setq mx (HCOL:ToPointList bb2))
+        (if (and mn mx (>= (length mn) 2) (>= (length mx) 2))
             (progn
-              ;; Put every new HCOL hatch on SH-COLUMN.
-              (vl-catch-all-apply
-                'vla-put-Layer
-                (list hatchObj "SH-COLUMN"))
-
-              ;; ANSI37 settings.  Pattern scale is left at 1.0 so the
-              ;; hatch follows the drawing units naturally; change this
-              ;; value later if a denser/looser pattern is desired.
-              (vl-catch-all-apply 'vla-put-PatternScale (list hatchObj 1.0))
-              (vl-catch-all-apply 'vla-put-PatternAngle (list hatchObj 0.0))
-              (vl-catch-all-apply 'vla-Evaluate (list hatchObj))
-
-              ;; IMPORTANT: keep the hatch BELOW its column boundary.
-              ;; This makes the duplicated column outline visible above
-              ;; the solid fill without changing the draw order of the
-              ;; rest of the drawing.
-              (HCOL:PutObjectBelow hatchObj colObj modelSpace)
+              (setq pts
+                    (list
+                      (list (/ (+ (car mn) (car mx)) 2.0) (/ (+ (cadr mn) (cadr mx)) 2.0))
+                      (list (car mn) (cadr mn))
+                      (list (car mn) (cadr mx))
+                      (list (car mx) (cadr mn))
+                      (list (car mx) (cadr mx))
+                    ))
+              (foreach p pts
+                (if (and (not hit) (HCOL:PtInPolyP p poly))
+                    (setq hit T)
+                )
+              )
             )
-            (vl-catch-all-apply 'vla-Delete (list hatchObj))
         )
       )
   )
+
+  ;; 2) If the hatch boundary itself intersects the column boundary,
+  ;;    treat it as overlapping the column and delete it too.
+  (if (and (not hit) (HCOL:AnyIntersectionP hatchObj colObj))
+      (setq hit T)
+  )
+  hit
+)
+
+(defun HCOL:DeleteOldHatches (modelSpace colData / obj delCount cd hit)
+  (setq delCount 0)
+  (vlax-for obj modelSpace
+    (if (and (= (vla-get-ObjectName obj) "AcDbHatch")
+             (not (vlax-erased-p obj)))
+        (progn
+          (setq hit nil)
+          (foreach cd colData
+            (if (and (not hit) (HCOL:HatchTouchesColumnP obj cd))
+                (setq hit T)
+            )
+          )
+          (if hit
+              (progn
+                (vl-catch-all-apply 'vla-Delete (list obj))
+                (setq delCount (1+ delCount))
+              )
+          )
+        )
+    )
+  )
+  delCount
+)
+
+;; ----------------------------------------------------------------------------
+;; Move one object to the bottom of ModelSpace draw order using the official
+;; ActiveX SortentsTable method. The column boundary is then moved to the top
+;; after the hatch is created, leaving the outline visibly above ANSI37.
+;; ----------------------------------------------------------------------------
+(defun HCOL:MoveToBottom (obj modelSpace doc / xdict sorttbl arr)
+  ;; Draw-order is best-effort only. Never let it stop HCOL.
+  (vl-catch-all-apply
+    '(lambda ()
+       (setq xdict (vla-GetExtensionDictionary modelSpace))
+       (setq sorttbl (vl-catch-all-apply 'vla-GetObject (list xdict "ACAD_SORTENTS")))
+       (if (vl-catch-all-error-p sorttbl)
+           (setq sorttbl (vl-catch-all-apply 'vla-AddObject
+                                             (list xdict "ACAD_SORTENTS" "AcDbSortentsTable"))))
+       (if (and sorttbl (not (vl-catch-all-error-p sorttbl)))
+           (progn
+             (setq arr (vlax-make-safearray vlax-vbObject '(0 . 0)))
+             (vlax-safearray-put-element arr 0 obj)
+             (vl-catch-all-apply 'vla-MoveToBottom (list sorttbl arr))))
+    )
+    '())
+  obj
+)
+
+(defun HCOL:MoveToTop (obj modelSpace doc / xdict sorttbl arr)
+  ;; Draw-order is best-effort only. Never let it stop HCOL.
+  (vl-catch-all-apply
+    '(lambda ()
+       (setq xdict (vla-GetExtensionDictionary modelSpace))
+       (setq sorttbl (vl-catch-all-apply 'vla-GetObject (list xdict "ACAD_SORTENTS")))
+       (if (vl-catch-all-error-p sorttbl)
+           (setq sorttbl (vl-catch-all-apply 'vla-AddObject
+                                             (list xdict "ACAD_SORTENTS" "AcDbSortentsTable"))))
+       (if (and sorttbl (not (vl-catch-all-error-p sorttbl)))
+           (progn
+             (setq arr (vlax-make-safearray vlax-vbObject '(0 . 0)))
+             (vlax-safearray-put-element arr 0 obj)
+             (vl-catch-all-apply 'vla-MoveToTop (list sorttbl arr))))
+    )
+    '())
+  obj
+)
+
+;; ----------------------------------------------------------------------------
+;; Final ANSI37 hatch. This is the LAST geometry operation.
+;; ----------------------------------------------------------------------------
+(defun HCOL:CreateANSI37Hatch (colObj modelSpace doc / hatchObj sa vArr ok lay)
+  (setq hatchObj
+        (vl-catch-all-apply
+          'vla-AddHatch
+          (list modelSpace 1 "ANSI37" :vlax-false)))
+  (if (and hatchObj (not (vl-catch-all-error-p hatchObj)))
+      (progn
+        ;; AppendOuterLoop in AutoCAD Visual LISP accepts the SAFEARRAY
+        ;; directly. Do NOT wrap it with vlax-make-variant here; that was
+        ;; the source of: bad argument type: variantp #<safearray...>
+        (setq vArr (vlax-make-safearray vlax-vbObject '(0 . 0)))
+        (vlax-safearray-put-element vArr 0 colObj)
+        ;; Call AppendOuterLoop directly inside a catch-all lambda.
+        ;; This avoids the COM argument marshalling problem that can report
+        ;;: bad argument type: variantp #<safearray...> in some AutoCAD builds.
+        (setq ok
+              (vl-catch-all-apply
+                '(lambda () (vla-AppendOuterLoop hatchObj vArr))
+                '()))
+        (if (vl-catch-all-error-p ok)
+            (progn
+              (vl-catch-all-apply 'vla-Delete (list hatchObj))
+              (setq hatchObj nil))
+            (progn
+              (setq lay (HCOL:EnsureHatchLayer doc))
+              (vl-catch-all-apply 'vla-put-Layer (list hatchObj "SH-COLUMN"))
+              (vl-catch-all-apply 'vla-put-PatternScale (list hatchObj 1.0))
+              (vl-catch-all-apply 'vla-put-PatternAngle (list hatchObj 0.0))
+              (setq ok (vl-catch-all-apply 'vla-Evaluate (list hatchObj)))
+              (if (vl-catch-all-error-p ok)
+                  (progn
+                    (vl-catch-all-apply 'vla-Delete (list hatchObj))
+                    (setq hatchObj nil))
+                  (progn
+                    ;; Draw-order cannot cancel successful hatch creation.
+                    (HCOL:MoveToBottom hatchObj modelSpace doc)
+                    (HCOL:MoveToTop colObj modelSpace doc))))))
   hatchObj
+)
 )
 
 ;; ----------------------------------------------------------------------------
@@ -2055,34 +2186,6 @@
 )
 
 ;; ----------------------------------------------------------------------------
-;; Close a polyline WITHOUT using the AutoCAD COMMAND/PEDIT command.
-;; This is important because COMMAND can produce:
-;;   "bad order function: COMMAND"
-;; when invoked while HCOL is already inside another command/error path.
-;; The ActiveX Closed property works for LWPOLYLINE and 2D POLYLINE.
-;; ----------------------------------------------------------------------------
-(defun HCOL:ClosePolylineIfNeeded (ent / obj closedFlag res)
-  (setq obj (vlax-ename->vla-object ent))
-  (setq closedFlag
-        (vl-catch-all-apply 'vlax-curve-isClosed (list obj)))
-  (if (and closedFlag
-           (not (vl-catch-all-error-p closedFlag))
-           closedFlag)
-      T
-      (progn
-        (setq res
-              (vl-catch-all-apply
-                'vla-put-Closed
-                (list obj :vlax-true)))
-        (if (vl-catch-all-error-p res)
-            nil
-            T
-        )
-      )
-  )
-)
-
-;; ----------------------------------------------------------------------------
 ;; MAIN (AND ONLY) COMMAND
 ;; ----------------------------------------------------------------------------
 (defun c:HCOL ( / doc modelSpace colSet colData colEnameSet oldColEnames
@@ -2090,7 +2193,7 @@
                   allPts params i p1 p2 midP midPt segList
                   newSegCount delCount oldDelCount hatchCount skippedCount
                   n res ent obj newObj pt1 pt2 newdata totalWallsTouched
-                  reportMsg closedNow closeRes autoClosedCount )
+                  reportMsg closedNow closeRes autoClosedCount oldHatchDelCount )
 
   (setq *HCOL-OLD-ERROR* *error*)
   (setq *error* 'HCOL:ErrorHandler)
@@ -2098,8 +2201,6 @@
   (setvar "cmdecho" 0)
 
   (setq doc (vla-get-ActiveDocument (vlax-get-acad-object)))
-  ;; Keep document available to the error handler so it can close the
-  ;; ActiveX undo mark without invoking (command).
   (setq *HCOL-DOC* doc)
   (setq modelSpace (vla-get-ModelSpace doc))
 
@@ -2131,8 +2232,7 @@
   )
   (princ (strcat "\n>> " (itoa (sslength wallSet)) " wall entitie(s) picked."))
 
-  ;; ActiveX undo mark: safer than (command "_.undo" "_group").
-  (vl-catch-all-apply 'vla-StartUndoMark (list doc))
+  (HCOL:StartUndo)
 
   ;; -------------------------------------------------------------------
   ;; Duplicate every CLOSED old column -> colData / colEnameSet
@@ -2151,19 +2251,28 @@
     (setq edata (entget ent))
     (if (HCOL:IsUsableColumn ent)
         (progn
-          ;; If this column only passed the tolerant endpoint test,
-          ;; close the polyline through ActiveX. NEVER use PEDIT/COMMAND.
-          ;; This avoids the "bad order function: COMMAND" failure.
-          (setq closedNow
-                (vl-catch-all-apply
-                  'vlax-curve-isClosed
-                  (list (vlax-ename->vla-object ent))))
-          (if (not (and closedNow
-                        (not (vl-catch-all-error-p closedNow))
-                        closedNow))
-              (if (HCOL:ClosePolylineIfNeeded ent)
-                  (setq autoClosedCount (1+ autoClosedCount))
-                  (setq skippedCount (1+ skippedCount))
+          ;; If this column is not TRULY closed yet (it only passed the
+          ;; tolerant "endpoints nearly coincide" fallback), physically
+          ;; close it now on the ORIGINAL entity, BEFORE duplicating -
+          ;; using the actual PEDIT + Close command, exactly as if done
+          ;; by hand, so the duplicate then inherits a real closing
+          ;; edge (not just a flag) and the hatch is always buildable.
+          ;; Only entities genuinely open are sent through PEDIT: if an
+          ;; already-closed polyline were sent "_Close", AutoCAD would
+          ;; offer "_Open" instead at that prompt and the call would
+          ;; fail - so this step is skipped entirely for anything
+          ;; already truly closed (including every CIRCLE/ELLIPSE).
+          (setq closedNow (vl-catch-all-apply 'vlax-curve-isClosed
+                                               (list (vlax-ename->vla-object ent))))
+          (if (not (and closedNow (not (vl-catch-all-error-p closedNow)) closedNow))
+              (progn
+                (setq closeRes
+                      (vl-catch-all-apply
+                        'vla-put-Closed
+                        (list (vlax-ename->vla-object ent) :vlax-true)))
+                (if (not (vl-catch-all-error-p closeRes))
+                    (setq autoClosedCount (1+ autoClosedCount))
+                )
               )
           )
           (setq obj (vlax-ename->vla-object ent))  ; same entity, re-fetched safely
@@ -2194,17 +2303,6 @@
         (HCOL:ErrorHandler nil)
         (exit)
       )
-  )
-
-  ;; -------------------------------------------------------------------
-  ;; Hatch every NEW duplicate boundary with SOLID
-  ;; -------------------------------------------------------------------
-  (setq hatchCount 0)
-  (foreach cd colData
-    (setq res (HCOL:CreateANSI37Hatch (car cd) modelSpace))
-    (if (and res (not (vl-catch-all-error-p res)))
-        (setq hatchCount (1+ hatchCount))
-    )
   )
 
   ;; -------------------------------------------------------------------
@@ -2336,16 +2434,34 @@
     )
   )
 
-  ;; Close the ActiveX undo mark; no COMMAND call.
-  (vl-catch-all-apply 'vla-EndUndoMark (list doc))
+  ;; -------------------------------------------------------------------
+  ;; FINAL CLEANUP: delete any existing Hatch inside/overlapping the
+  ;; column boundary BEFORE creating the new final ANSI37 hatch.
+  ;; -------------------------------------------------------------------
+  (setq oldHatchDelCount (HCOL:DeleteOldHatches modelSpace colData))
+
+  ;; -------------------------------------------------------------------
+  ;; FINAL OPERATION: create ANSI37 hatch on SH-COLUMN. Nothing that
+  ;; changes geometry is performed after this point.
+  ;; -------------------------------------------------------------------
+  (setq hatchCount 0)
+  (foreach cd colData
+    (setq res (HCOL:CreateANSI37Hatch (car cd) modelSpace doc))
+    (if (and res (not (vl-catch-all-error-p res)))
+        (setq hatchCount (1+ hatchCount))
+    )
+  )
+
+  (HCOL:EndUndo)
   (setvar "cmdecho" *HCOL-OLD-CMDECHO*)
-  (setq *HCOL-DOC* nil)
   (setq *error* *HCOL-OLD-ERROR*)
 
   (setq reportMsg
         (strcat
           "HCOL finished:\n"
-          "- Columns duplicated & hatched: " (itoa hatchCount) "\n"
+          "- Columns duplicated: " (itoa (length colData)) "\n"
+          "- Final ANSI37 hatches created: " (itoa hatchCount) "\n"
+          "- Old hatches removed: " (itoa oldHatchDelCount) "\n"
           "- Columns auto-closed (small gap fixed): " (itoa autoClosedCount) "\n"
           "- Columns skipped (not closed / copy failed): " (itoa skippedCount) "\n"
           "- Walls that touched a column: " (itoa totalWallsTouched) "\n"
@@ -2363,6 +2479,7 @@
                     "themselves, not a block containing them."))
   )
   (alert reportMsg)
+  (setq *HCOL-DOC* nil)
   (princ)
 )
 
