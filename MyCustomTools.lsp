@@ -1534,7 +1534,7 @@
 ;; -------------------------------------------------------------------------
 ;; 6. Main Execution Loop
 ;; -------------------------------------------------------------------------
-(defun c:CLL ( / col-layer run loop gr code pt is-toggled snap-info snap-pt snap-type draw-pt)
+(defun c:SCL ( / col-layer run loop gr code pt is-toggled snap-info snap-pt snap-type draw-pt)
   (setq col-layer "S-COLUMN")
   
   (if (null (tblsearch "LAYER" col-layer))
@@ -1624,8 +1624,13 @@
   (princ)
 )
 
-(princ "\nCLL loaded successfully. Type CLL to start.")
+(princ "\nSCL loaded successfully. Type SCL to start.")
 (princ)
+
+
+
+
+
 
 
 
@@ -1686,6 +1691,8 @@
 (setq *HCOL-CLOSE-TOL* 0.01)     ; looser tolerance (1 cm) just for deciding
                                  ; whether a manually-closed polyline counts
                                  ; as closed (hand-snapping is rarely sub-mm)
+(setq *HCOL-HATCH-TOL* 0.01)     ; tolerance (1 cm) used when looking for an OLD
+                                 ; hatch that sits on a column
 
 ;; ----------------------------------------------------------------------------
 ;; Error handler - guarantees the undo group is always closed.
@@ -1899,6 +1906,57 @@
 )
 
 ;; ----------------------------------------------------------------------------
+;; Delete any OLD hatch that sits on a column (called BEFORE the new hatch is
+;; drawn). A hatch counts as "old hatch of this column" when its bounding box
+;; lies completely inside the column's bounding box (+/- *HCOL-HATCH-TOL*), so
+;; big hatches that merely pass under/over the column are never touched.
+;; Returns (deletedCount failedCount).
+;; ----------------------------------------------------------------------------
+(defun HCOL:DeleteOldHatches (colObj / mn mx hmn hmx bbRes ss k ent hobj tol hdel hfail)
+  (setq hdel 0)
+  (setq hfail 0)
+  (setq tol *HCOL-HATCH-TOL*)
+  (setq bbRes (vl-catch-all-apply 'vla-GetBoundingBox (list colObj 'mn 'mx)))
+  (if (not (vl-catch-all-error-p bbRes))
+      (progn
+        (setq mn (vlax-safearray->list mn))
+        (setq mx (vlax-safearray->list mx))
+        (setq ss (ssget "_C"
+                        (list (- (car mn) tol) (- (cadr mn) tol))
+                        (list (+ (car mx) tol) (+ (cadr mx) tol))
+                        '((0 . "HATCH"))))
+        (if ss
+            (progn
+              (setq k 0)
+              (while (< k (sslength ss))
+                (setq ent  (ssname ss k))
+                (setq hobj (vlax-ename->vla-object ent))
+                (setq bbRes (vl-catch-all-apply 'vla-GetBoundingBox (list hobj 'hmn 'hmx)))
+                (if (not (vl-catch-all-error-p bbRes))
+                    (progn
+                      (setq hmn (vlax-safearray->list hmn))
+                      (setq hmx (vlax-safearray->list hmx))
+                      (if (and (>= (car hmn)  (- (car mn)  tol))
+                               (>= (cadr hmn) (- (cadr mn) tol))
+                               (<= (car hmx)  (+ (car mx)  tol))
+                               (<= (cadr hmx) (+ (cadr mx) tol)))
+                          (if (vl-catch-all-error-p (vl-catch-all-apply 'entdel (list ent)))
+                              (setq hfail (1+ hfail))
+                              (setq hdel (1+ hdel))
+                          )
+                      )
+                    )
+                )
+                (setq k (1+ k))
+              )
+            )
+        )
+      )
+  )
+  (list hdel hfail)
+)
+
+;; ----------------------------------------------------------------------------
 ;; Create ANSI37 hatch and explicit Send-To-Back (Draw Order)
 ;; ----------------------------------------------------------------------------
 (defun HCOL:CreateSolidHatch (colObj modelSpace / hatchObj sa vArr ok
@@ -2036,7 +2094,8 @@
                   allPts params i p1 p2 midP midPt segList
                   newSegCount delCount oldDelCount hatchCount skippedCount
                   n res ent obj newObj pt1 pt2 newdata totalWallsTouched
-                  reportMsg closedNow closeRes autoClosedCount )
+                  reportMsg closedNow closeRes autoClosedCount
+                  oldMeasurement newMeasurement oldHatchDel oldHatchFail hRes )
 
   (setq *HCOL-OLD-ERROR* *error*)
   (setq *error* 'HCOL:ErrorHandler)
@@ -2131,6 +2190,20 @@
   ;; -------------------------------------------------------------------
   ;; Hatch every NEW duplicate boundary with ANSI37 (includes Draw Order)
   ;; -------------------------------------------------------------------
+  ;; MEASUREMENT -> 0 (set BEFORE any hatch is drawn)
+  (setq oldMeasurement (getvar "MEASUREMENT"))
+  (vl-catch-all-apply 'setvar (list "MEASUREMENT" 0))
+  (setq newMeasurement (getvar "MEASUREMENT"))
+
+  ;; Delete any OLD hatch on the column(s) BEFORE drawing the new hatch
+  (setq oldHatchDel 0)
+  (setq oldHatchFail 0)
+  (foreach cd colData
+    (setq hRes (HCOL:DeleteOldHatches (car cd)))
+    (setq oldHatchDel  (+ oldHatchDel  (car hRes)))
+    (setq oldHatchFail (+ oldHatchFail (cadr hRes)))
+  )
+
   (setq hatchCount 0)
   (foreach cd colData
     (setq res (HCOL:CreateSolidHatch (car cd) modelSpace))
@@ -2256,6 +2329,13 @@
   (setq reportMsg
         (strcat
           "HCOL finished:\n"
+          "- MEASUREMENT: was " (vl-princ-to-string oldMeasurement)
+          " -> now " (vl-princ-to-string newMeasurement) " (set before hatching)\n"
+          "- Old hatches deleted before drawing the new ones: " (itoa oldHatchDel) "\n"
+          (if (> oldHatchFail 0)
+              (strcat "- Old hatches that could NOT be deleted (locked layer?): "
+                      (itoa oldHatchFail) "\n")
+              "")
           "- Columns duplicated & hatched: " (itoa hatchCount) "\n"
           "- Columns auto-closed (small gap fixed): " (itoa autoClosedCount) "\n"
           "- Columns skipped (not closed / copy failed): " (itoa skippedCount) "\n"
@@ -2278,4 +2358,1253 @@
 )
 
 (princ "\nHCOL loaded. Type HCOL to run.")
+(princ)
+
+
+
+
+
+
+;; =========================================================
+;; Load Smart Wall Custom Tool Automatically with YQArch
+;; =========================================================
+(vl-load-com)
+(load "YQ_SmartWall.lsp" "\nError: Could not load YQ_SmartWall.lsp")
+
+
+
+
+
+
+
+;; ===========================================================================
+;; Load APLAN Auto Apartment Planner Custom Tool Automatically with YQArch
+;; ===========================================================================
+(vl-load-com)
+(load "APLAN.lsp" "\nError: Could not load APLAN.lsp")
+
+
+
+
+
+
+
+;; ===========================================================================
+;; Load AXCL.lsp Custom Tool Automatically with YQArch
+;; ===========================================================================
+(vl-load-com)
+(load "AXCL.lsp" "\nError: Could not load AXCL.lsp")
+
+
+
+
+
+
+
+;; ===========================================================================
+;; Load SUPERWALL.lsp Custom Tool Automatically with YQArch
+;; ===========================================================================
+(vl-load-com)
+(load "SUPERWALL.lsp" "\nError: Could not load SUPERWALL.lsp")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;;; ------------------------------------------------------------------
+;;; HWALL.lsp
+;;; Solid hatch for walls drawn as pairs of parallel lines (open shapes)
+;;; Command : HWALL
+;;; Units   : meters
+;;;
+;;; How it works
+;;;  1. Reads LINE, LWPOLYLINE, ARC and MLINE objects on layers whose
+;;;     name contains WALL (any case). Layers containing HATCH are ignored.
+;;;  2. Finds pairs of parallel lines (or concentric arcs) whose distance
+;;;     is between 0.05 m and the max thickness typed by the user.
+;;;  3. For every pair builds a closed boundary (the shorter common part)
+;;;     and creates a SOLID hatch on layer WALL-HATCH (color 8).
+;;;  4. Fills the small squares at L / T / X junctions.
+;;;  5. Sends the new hatches to back. Old hatches are never deleted.
+;;; ------------------------------------------------------------------
+(vl-load-com)
+
+(setq *hw-min* 0.05)
+(if (not *hw-max*) (setq *hw-max* 0.30))
+
+;;; ---------------- basic helpers ----------------
+
+(defun hw:norm-ang (a)
+  (while (< a 0.0) (setq a (+ a (* 2.0 pi))))
+  (while (>= a (* 2.0 pi)) (setq a (- a (* 2.0 pi))))
+  a
+)
+
+(defun hw:arc-ext (a1 a2 / d)
+  (setq d (- a2 a1))
+  (while (<= d 1.0e-9) (setq d (+ d (* 2.0 pi))))
+  d
+)
+
+(defun hw:pt-polar (c r a)
+  (list (+ (car c) (* r (cos a))) (+ (cadr c) (* r (sin a))))
+)
+
+(defun hw:uv (ux uy tt o)
+  (list (- (* tt ux) (* o uy)) (+ (* tt uy) (* o ux)))
+)
+
+(defun hw:wall-layer-p (lay / u)
+  (setq u (strcase lay))
+  (and (vl-string-search "WALL" u)
+       (not (vl-string-search "HATCH" u)))
+)
+
+;;; ---------------- segment extraction ----------------
+
+;; bulge segment -> (L p1 p2) or (A center radius a1 a2)
+(defun hw:bulge-seg (p1 p2 b / tmp th dx dy len r ux uy h cen)
+  (if (< (abs b) 1.0e-9)
+    (if (> (distance p1 p2) 1.0e-4) (list 'L p1 p2) nil)
+    (progn
+      (if (< b 0.0)
+        (setq tmp p1 p1 p2 p2 tmp b (- b))
+      )
+      (setq th  (* 4.0 (atan b))
+            dx  (- (car p2) (car p1))
+            dy  (- (cadr p2) (cadr p1))
+            len (sqrt (+ (* dx dx) (* dy dy)))
+      )
+      (if (< len 1.0e-6)
+        nil
+        (progn
+          (setq r   (/ len (* 2.0 (sin (/ th 2.0))))
+                ux  (/ dx len)
+                uy  (/ dy len)
+                h   (* r (cos (/ th 2.0)))
+                cen (list (+ (/ (+ (car p1) (car p2)) 2.0) (* (- uy) h))
+                          (+ (/ (+ (cadr p1) (cadr p2)) 2.0) (* ux h)))
+          )
+          (list 'A cen r
+                (hw:norm-ang (angle cen p1))
+                (hw:norm-ang (angle cen p2)))
+        )
+      )
+    )
+  )
+)
+
+(defun hw:lw-segs (ed / d vs closed n i res s a b)
+  (foreach d ed
+    (cond
+      ((= (car d) 10)
+       (setq vs (cons (list (cadr d) (caddr d) 0.0) vs)))
+      ((and (= (car d) 42) vs)
+       (setq vs (cons (list (car (car vs)) (cadr (car vs)) (cdr d)) (cdr vs))))
+    )
+  )
+  (setq vs     (reverse vs)
+        n      (length vs)
+        closed (= 1 (logand 1 (cdr (assoc 70 ed))))
+        i      0
+  )
+  (while (< i (1- n))
+    (setq a (nth i vs)
+          b (nth (1+ i) vs)
+          s (hw:bulge-seg (list (car a) (cadr a)) (list (car b) (cadr b)) (caddr a))
+    )
+    (if s (setq res (cons s res)))
+    (setq i (1+ i))
+  )
+  (if (and closed (> n 2))
+    (progn
+      (setq a (nth (1- n) vs)
+            b (car vs)
+            s (hw:bulge-seg (list (car a) (cadr a)) (list (car b) (cadr b)) (caddr a))
+      )
+      (if s (setq res (cons s res)))
+    )
+  )
+  (reverse res)
+)
+
+(defun hw:mline-segs (en / obj res lst o e ed typ segs)
+  (setq obj (vlax-ename->vla-object en)
+        res (vl-catch-all-apply 'vla-explode (list obj))
+  )
+  (if (not (vl-catch-all-error-p res))
+    (progn
+      (setq lst (vl-catch-all-apply 'vlax-safearray->list (list (vlax-variant-value res))))
+      (if (not (vl-catch-all-error-p lst))
+        (foreach o lst
+          (setq e   (vlax-vla-object->ename o)
+                ed  (entget e)
+                typ (cdr (assoc 0 ed))
+          )
+          (if (member typ '("LINE" "ARC"))
+            (setq segs (append segs (hw:ent-segs e)))
+          )
+          (entdel e)
+        )
+      )
+    )
+  )
+  segs
+)
+
+(defun hw:ent-segs (en / ed typ p1 p2)
+  (setq ed  (entget en)
+        typ (cdr (assoc 0 ed))
+  )
+  (cond
+    ((= typ "LINE")
+     (setq p1 (cdr (assoc 10 ed))
+           p2 (cdr (assoc 11 ed))
+           p1 (list (car p1) (cadr p1))
+           p2 (list (car p2) (cadr p2))
+     )
+     (if (> (distance p1 p2) 1.0e-4)
+       (list (list 'L p1 p2))
+       nil
+     )
+    )
+    ((= typ "ARC")
+     (setq p1 (cdr (assoc 10 ed)))
+     (list (list 'A
+                 (list (car p1) (cadr p1))
+                 (cdr (assoc 40 ed))
+                 (hw:norm-ang (cdr (assoc 50 ed)))
+                 (hw:norm-ang (cdr (assoc 51 ed)))))
+    )
+    ((= typ "LWPOLYLINE") (hw:lw-segs ed))
+    ((= typ "MLINE") (hw:mline-segs en))
+    (t nil)
+  )
+)
+
+;;; ---------------- straight walls ----------------
+
+;; COLUMN boundary detection. HATCH layers are deliberately ignored.
+(defun hw:column-layer-p (lay / u)
+  (setq u (strcase lay))
+  (and (vl-string-search "COLUMN" u)
+       (not (vl-string-search "HATCH" u)))
+)
+
+(defun hw:pt-on-edge-p (p e / a b dx dy px py ll cr dot tol)
+  (setq a (car e)
+        b (cadr e)
+        dx (- (car b) (car a))
+        dy (- (cadr b) (cadr a))
+        px (- (car p) (car a))
+        py (- (cadr p) (cadr a))
+        ll (+ (* dx dx) (* dy dy))
+        cr (- (* dx py) (* dy px))
+        dot (+ (* px dx) (* py dy))
+        tol 1.0e-5)
+  (and (> ll 1.0e-12)
+       (<= (abs cr) (* tol (sqrt ll)))
+       (>= dot (- (* tol (sqrt ll))))
+       (<= dot (+ ll (* tol (sqrt ll)))))
+)
+
+(defun hw:point-on-column-edge-p (p edges / e hit)
+  (foreach e edges
+    (if (and (not hit) (hw:pt-on-edge-p p e))
+      (setq hit T)))
+  hit
+)
+
+;; Even/odd ray test works for closed column polylines and closed loops
+;; made from separate LINE objects.
+(defun hw:point-in-columns-p (p edges / e a b x y ay by ix hits onedge)
+  (setq x (car p) y (cadr p) hits 0 onedge nil)
+  (foreach e edges
+    (setq a (car e) b (cadr e)
+          ay (cadr a) by (cadr b))
+    (if (hw:pt-on-edge-p p e)
+      (setq onedge T))
+    (if (or (and (<= ay y) (> by y))
+            (and (<= by y) (> ay y)))
+      (progn
+        (setq ix (+ (car a) (* (/ (- y ay) (- by ay)) (- (car b) (car a)))) )
+        (if (> ix x) (setq hits (1+ hits)))))
+  )
+  (or onedge (= (rem hits 2) 1))
+)
+
+(defun hw:edge-cut-param (p1 p2 e / q1 q2 rx ry sx sy qpx qpy den tt uu)
+  (setq q1 (car e) q2 (cadr e)
+        rx (- (car p2) (car p1))
+        ry (- (cadr p2) (cadr p1))
+        sx (- (car q2) (car q1))
+        sy (- (cadr q2) (cadr q1))
+        qpx (- (car q1) (car p1))
+        qpy (- (cadr q1) (cadr p1))
+        den (- (* rx sy) (* ry sx)))
+  (if (> (abs den) 1.0e-10)
+    (progn
+      (setq tt (/ (- (* qpx sy) (* qpy sx)) den)
+            uu (/ (- (* qpx ry) (* qpy rx)) den))
+      (if (and (>= tt -1.0e-8) (<= tt 1.00000001)
+               (>= uu -1.0e-8) (<= uu 1.00000001))
+        (max 0.0 (min 1.0 tt)))))
+)
+
+(defun hw:unique-params (nums / sorted result prev n)
+  (setq sorted (vl-sort nums '<) result nil prev nil)
+  (foreach n sorted
+    (if (or (null prev) (> (abs (- n prev)) 1.0e-7))
+      (setq result (cons n result) prev n)))
+  (reverse result)
+)
+
+;; Split a straight wall segment at column boundaries and discard portions
+;; inside the column footprint. Each result is (p1 p2 blocked-start blocked-end).
+(defun hw:trim-wall-seg (p1 p2 edges / cuts e tt ordered t0 t1 tm pm q1 q2 res)
+  (setq cuts (list 0.0 1.0))
+  (foreach e edges
+    (if (setq tt (hw:edge-cut-param p1 p2 e))
+      (setq cuts (cons tt cuts))))
+  (setq ordered (hw:unique-params cuts)
+        res nil)
+  (while (cdr ordered)
+    (setq t0 (car ordered)
+          t1 (cadr ordered))
+    (if (> (- t1 t0) 1.0e-6)
+      (progn
+        (setq tm (/ (+ t0 t1) 2.0)
+              pm (list (+ (car p1) (* (- (car p2) (car p1)) tm))
+                       (+ (cadr p1) (* (- (cadr p2) (cadr p1)) tm)))
+        )
+        (if (not (hw:point-in-columns-p pm edges))
+          (progn
+            (setq q1 (list (+ (car p1) (* (- (car p2) (car p1)) t0))
+                           (+ (cadr p1) (* (- (cadr p2) (cadr p1)) t0)))
+                  q2 (list (+ (car p1) (* (- (car p2) (car p1)) t1))
+                           (+ (cadr p1) (* (- (cadr p2) (cadr p1)) t1)))
+                  res (cons (list q1 q2
+                                  (or (> t0 1.0e-6) (hw:point-on-column-edge-p q1 edges))
+                                  (or (< t1 0.999999) (hw:point-on-column-edge-p q2 edges))) res))
+          )
+        )
+      )
+    )
+    (setq ordered (cdr ordered))
+  )
+  (reverse res)
+)
+
+;; Line record adds blocked-start / blocked-end flags at indexes 8 and 9.
+(defun hw:make-line-core (p1 p2 cut1 cut2 / dx dy len ux uy tmp tmpc)
+  (setq dx  (- (car p2) (car p1))
+        dy  (- (cadr p2) (cadr p1))
+        len (sqrt (+ (* dx dx) (* dy dy)))
+        ux  (/ dx len)
+        uy  (/ dy len))
+  ;; Use the dominant axis to keep near-vertical lines oriented consistently.
+  ;; A tiny negative X component must not reverse an otherwise upward line.
+  (if (or (and (>= (abs ux) (abs uy)) (< ux 0.0))
+          (and (< (abs ux) (abs uy)) (< uy 0.0)))
+    (setq tmp p1 p1 p2 p2 tmp
+          tmpc cut1 cut1 cut2 cut2 tmpc
+          ux (- ux) uy (- uy)))
+  (list p1 ux uy len
+        (min (car p1) (car p2)) (min (cadr p1) (cadr p2))
+        (max (car p1) (car p2)) (max (cadr p1) (cadr p2))
+        cut1 cut2)
+)
+
+(defun hw:make-line (p1 p2)
+  (hw:make-line-core p1 p2 nil nil)
+)
+
+;; Detect a perpendicular thickness step at a candidate hatch endpoint.
+;; Stop at that step instead of extending the thinner hatch by *hw-max*.
+(defun hw:step-edge-p (p ref partner all / ux uy nx ny refp1 refp2 partp1 e ep1 ep2 c cp1 cp2 cr gpair galt tc rvec cvec rproj cproj hit)
+  (setq ux (nth 1 ref)
+        uy (nth 2 ref)
+        nx (- uy)
+        ny ux
+        refp1 (car ref)
+        refp2 (list (+ (car refp1) (* ux (nth 3 ref)))
+                    (+ (cadr refp1) (* uy (nth 3 ref))))
+        partp1 (car partner)
+        gpair (abs (+ (* nx (- (car partp1) (car refp1)))
+                      (* ny (- (cadr partp1) (cadr refp1))))))
+  (foreach e all
+    (if (not hit)
+      (progn
+        (setq ep1 (car e)
+              ep2 (list (+ (car ep1) (* (nth 1 e) (nth 3 e)))
+                        (+ (cadr ep1) (* (nth 2 e) (nth 3 e))))
+              cr (abs (- (* ux (nth 2 e)) (* uy (nth 1 e)))))
+        (if (and (> cr 0.50)
+                 (or (<= (distance p refp1) 1.0e-3)
+                     (<= (distance p refp2) 1.0e-3))
+                 (<= (hw:pt-seg-dist p ep1 ep2) 1.0e-3))
+          (foreach c all
+            (if (and (not hit)
+                     (not (equal c ref))
+                     (not (equal c partner)))
+              (progn
+                (setq cp1 (car c)
+                      cp2 (list (+ (car cp1) (* (nth 1 c) (nth 3 c)))
+                                (+ (cadr cp1) (* (nth 2 c) (nth 3 c))))
+                      cr (abs (- (* ux (nth 2 c)) (* uy (nth 1 c)))))
+                (setq tc (hw:edge-cut-param cp1 cp2 (list ep1 ep2)))
+                (if (and (< cr 0.01)
+                         tc
+                         (or (<= (abs tc) 1.0e-3)
+                             (<= (abs (- tc 1.0)) 1.0e-3)))
+                  (progn
+                    (setq rvec (if (<= (distance p refp1) 1.0e-3)
+                                 (list (- (car refp2) (car refp1))
+                                       (- (cadr refp2) (cadr refp1)))
+                                 (list (- (car refp1) (car refp2))
+                                       (- (cadr refp1) (cadr refp2))))
+                          cvec (if (< tc 0.5)
+                                 (list (- (car cp2) (car cp1))
+                                       (- (cadr cp2) (cadr cp1)))
+                                 (list (- (car cp1) (car cp2))
+                                       (- (cadr cp1) (cadr cp2))))
+                          rproj (+ (* ux (car rvec)) (* uy (cadr rvec)))
+                          cproj (+ (* ux (car cvec)) (* uy (cadr cvec)))
+                          galt
+                      (abs (+ (* nx (- (car cp1) (car refp1)))
+                              (* ny (- (cadr cp1) (cadr refp1))))))
+                    (if (and (< (* rproj cproj) 0.0)
+                             (> (abs (- galt gpair)) 0.005))
+                      (setq hit T))))))))))
+  )
+  hit
+)
+
+(defun hw:pair-step-end-p (a b tt t1 dp / ap ux uy bp bux buy k pa pb)
+  (setq ap (car a)
+        ux (nth 1 a)
+        uy (nth 2 a)
+        bp (car b)
+        bux (nth 1 b)
+        buy (nth 2 b)
+        k (/ (- tt t1) dp)
+        pa (list (+ (car ap) (* ux tt))
+                 (+ (cadr ap) (* uy tt)))
+        pb (list (+ (car bp) (* bux k))
+                 (+ (cadr bp) (* buy k))))
+  (or (hw:step-edge-p pa a b *hw-lines*)
+      (hw:step-edge-p pb b a *hw-lines*))
+)
+
+;; rect record: (P1 P2 P3 P4 ux uy omin omax tlo thi skew blocked-lo blocked-hi)
+;; A small angular mismatch is accepted only while the actual gap stays within
+;; the requested wall-thickness limits at both ends. Skewed pairs use a true
+;; quadrilateral rather than forcing the second face to be perfectly parallel.
+(defun hw:line-pair (a b / ap ux uy alen bp bux buy blen cr nx ny dx dy s dp
+                       t1 t2 bl bh lo hi lo0 hi0 ulo uhi p1 p2 p3 p4 om1
+                       slo shi k1 k2 blocklo blockhi steplo stephi skew)
+  (setq ap   (car a)
+        ux   (nth 1 a)
+        uy   (nth 2 a)
+        alen (nth 3 a)
+        bp   (car b)
+        bux  (nth 1 b)
+        buy  (nth 2 b)
+        blen (nth 3 b)
+        cr   (- (* ux buy) (* uy bux))
+        dp   (+ (* ux bux) (* uy buy)))
+  (if (and (< (abs cr) 0.01) (> dp 0.0))
+    (progn
+      (setq nx (- uy)
+            ny ux
+            dx (- (car bp) (car ap))
+            dy (- (cadr bp) (cadr ap))
+            s  (+ (* nx dx) (* ny dy))
+            t1 (+ (* ux dx) (* uy dy))
+            t2 (+ t1 (* blen dp))
+            bl (min t1 t2)
+            bh (max t1 t2)
+            lo0 (max 0.0 bl)
+            hi0 (min alen bh))
+      (if (> (- hi0 lo0) 1.0e-4)
+        (progn
+          (setq slo (+ s (* cr (/ (- lo0 t1) dp)))
+                shi (+ s (* cr (/ (- hi0 t1) dp))))
+          (if (and (> (* slo shi) 0.0)
+                   (>= (abs slo) (- *hw-min* 1.0e-4))
+                   (<= (abs slo) (+ *hw-max* 1.0e-4))
+                   (>= (abs shi) (- *hw-min* 1.0e-4))
+                   (<= (abs shi) (+ *hw-max* 1.0e-4)))
+            (progn
+              (setq ulo (min 0.0 bl)
+                    uhi (max alen bh)
+                    ;; Step endpoints stop longitudinal extension, but only
+                    ;; column-cut flags are stored in the rect for gap filling.
+                    blocklo (or (nth 8 a) (nth 8 b))
+                    blockhi (or (nth 9 a) (nth 9 b))
+                    steplo (hw:pair-step-end-p a b lo0 t1 dp)
+                    stephi (hw:pair-step-end-p a b hi0 t1 dp)
+                    lo (if (or blocklo steplo) lo0 (max ulo (- lo0 *hw-max*)))
+                    hi (if (or blockhi stephi) hi0 (min uhi (+ hi0 *hw-max*)))
+                    k1 (/ (- lo t1) dp)
+                    k2 (/ (- hi t1) dp)
+                    p1 (list (+ (car ap) (* ux lo)) (+ (cadr ap) (* uy lo)))
+                    p2 (list (+ (car ap) (* ux hi)) (+ (cadr ap) (* uy hi)))
+                    p3 (list (+ (car bp) (* bux k2)) (+ (cadr bp) (* buy k2)))
+                    p4 (list (+ (car bp) (* bux k1)) (+ (cadr bp) (* buy k1)))
+                    om1 (+ (* nx (car ap)) (* ny (cadr ap)))
+                    skew (> (abs cr) 2.0e-4))
+              (list p1 p2 p3 p4 ux uy
+                    (min om1 (+ om1 s)) (max om1 (+ om1 s))
+                    (+ (* ux (car p1)) (* uy (cadr p1)))
+                    (+ (* ux (car p2)) (* uy (cadr p2)))
+                    skew blocklo blockhi)))))))
+)
+
+;; Supplemental recovery for a skewed pair whose gap changes along its
+;; overlap. The normal hw:line-pair routine runs first and is not changed.
+;; This returns only the longitudinal interval where the measured gap remains
+;; within the existing [*hw-min*, *hw-max*] limits.
+(defun hw:line-pair-clipped (a b / ap ux uy alen bp bux buy blen cr dp nx ny dx dy
+                               s t1 t2 bl bh lo hi slo shi dlo dhi dmin dmax ta tb
+                               clo chi k1 k2 p1 p2 p3 p4 om1 blocklo blockhi)
+  (setq ap   (car a)
+        ux   (nth 1 a)
+        uy   (nth 2 a)
+        alen (nth 3 a)
+        bp   (car b)
+        bux  (nth 1 b)
+        buy  (nth 2 b)
+        blen (nth 3 b)
+        cr   (- (* ux buy) (* uy bux))
+        dp   (+ (* ux bux) (* uy buy)))
+  (if (and (< (abs cr) 0.01) (> dp 0.0))
+    (progn
+      (setq nx (- uy)
+            ny ux
+            dx (- (car bp) (car ap))
+            dy (- (cadr bp) (cadr ap))
+            s  (+ (* nx dx) (* ny dy))
+            t1 (+ (* ux dx) (* uy dy))
+            t2 (+ t1 (* blen dp))
+            bl (min t1 t2)
+            bh (max t1 t2)
+            lo (max 0.0 bl)
+            hi (min alen bh)
+            dmin (- *hw-min* 1.0e-4)
+            dmax (+ *hw-max* 1.0e-4))
+      (if (> (- hi lo) 1.0e-4)
+        (progn
+          (setq slo (+ s (* cr (/ (- lo t1) dp)))
+                shi (+ s (* cr (/ (- hi t1) dp)))
+                dlo (abs slo)
+                dhi (abs shi))
+          ;; Do not hatch crossed lines or pairs whose gap is effectively zero.
+          ;; This pass is needed only when the normal full-span test rejects
+          ;; at least one end because the gap changes outside the allowed range.
+          (if (and (> (* slo shi) 0.0)
+                   (or (< dlo dmin) (> dlo dmax)
+                       (< dhi dmin) (> dhi dmax))
+                   (> (abs (- dhi dlo)) 1.0e-9))
+            (progn
+              ;; Solve the two points where the linear gap crosses min/max.
+              (setq ta (+ lo (* (/ (- dmin dlo) (- dhi dlo)) (- hi lo)))
+                    tb (+ lo (* (/ (- dmax dlo) (- dhi dlo)) (- hi lo)))
+                    clo (max lo (min ta tb))
+                    chi (min hi (max ta tb)))
+              (if (> (- chi clo) 1.0e-4)
+                (progn
+                  (setq k1 (/ (- clo t1) dp)
+                        k2 (/ (- chi t1) dp)
+                        p1 (list (+ (car ap) (* ux clo))
+                                 (+ (cadr ap) (* uy clo)))
+                        p2 (list (+ (car ap) (* ux chi))
+                                 (+ (cadr ap) (* uy chi)))
+                        p3 (list (+ (car bp) (* bux k2))
+                                 (+ (cadr bp) (* buy k2)))
+                        p4 (list (+ (car bp) (* bux k1))
+                                 (+ (cadr bp) (* buy k1)))
+                        om1 (+ (* nx (car ap)) (* ny (cadr ap)))
+                        blocklo (or (nth 8 a) (nth 8 b))
+                        blockhi (or (nth 9 a) (nth 9 b)))
+                  (list p1 p2 p3 p4 ux uy
+                        (min om1 (+ om1 s))
+                        (max om1 (+ om1 s))
+                        clo chi (> (abs cr) 2.0e-4)
+                        blocklo blockhi)))))))))
+)
+
+(defun hw:rect->poly (r / res k)
+  (foreach k '(0 1 2 3)
+    (setq res (cons (list (car (nth k r)) (cadr (nth k r)) 0.0) res))
+  )
+  (reverse res)
+)
+
+;;; ---------------- curved walls ----------------
+
+(defun hw:arc-pieces (c r1 r2 lo hi / n step i a1 a2 bg res)
+  (setq n    (max 1 (fix (+ 0.999999 (/ (- hi lo) pi))))
+        step (/ (- hi lo) n)
+        bg   (/ (sin (/ step 4.0)) (cos (/ step 4.0)))
+        i    0
+  )
+  (while (< i n)
+    (setq a1 (+ lo (* i step))
+          a2 (+ a1 step)
+    )
+    (setq res
+      (cons (list (append (hw:pt-polar c r1 a1) (list bg))
+                  (append (hw:pt-polar c r1 a2) (list 0.0))
+                  (append (hw:pt-polar c r2 a2) (list (- bg)))
+                  (append (hw:pt-polar c r2 a1) (list 0.0)))
+            res)
+    )
+    (setq i (1+ i))
+  )
+  res
+)
+
+;; arc record: (center radius a1 a2)
+(defun hw:arc-pair (a b / ca ra sa ea cb rb sb eb d r1 r2 k sbk lo hi res)
+  (setq ca (car a)
+        ra (cadr a)
+        sa (caddr a)
+        ea (hw:arc-ext sa (cadddr a))
+        cb (car b)
+        rb (cadr b)
+        sb (caddr b)
+        eb (hw:arc-ext sb (cadddr b))
+  )
+  (if (< (distance ca cb) 1.0e-3)
+    (progn
+      (setq d (abs (- ra rb)))
+      (if (and (>= d (- *hw-min* 1.0e-4)) (<= d (+ *hw-max* 1.0e-4)))
+        (progn
+          (setq r1 (max ra rb)
+                r2 (min ra rb)
+          )
+          (foreach k '(-1 0 1)
+            (setq sbk (+ sb (* k 2.0 pi))
+                  lo  (max sa sbk)
+                  hi  (min (+ sa ea) (+ sbk eb))
+            )
+            (if (> (* r2 (- hi lo)) 1.0e-4)
+              (setq res (append res (hw:arc-pieces ca r1 r2 lo hi)))
+            )
+          )
+        )
+      )
+    )
+  )
+  res
+)
+
+;;; ---------------- junction filling (X crossings) ----------------
+
+(defun hw:cr (a b p)
+  (- (* (- (car b) (car a)) (- (cadr p) (cadr a)))
+     (* (- (cadr b) (cadr a)) (- (car p) (car a))))
+)
+
+(defun hw:in-quad (p q / c1 c2 c3 c4)
+  (setq c1 (hw:cr (nth 0 q) (nth 1 q) p)
+        c2 (hw:cr (nth 1 q) (nth 2 q) p)
+        c3 (hw:cr (nth 2 q) (nth 3 q) p)
+        c4 (hw:cr (nth 3 q) (nth 0 q) p)
+  )
+  (or (and (>= c1 -1.0e-6) (>= c2 -1.0e-6) (>= c3 -1.0e-6) (>= c4 -1.0e-6))
+      (and (<= c1 1.0e-6) (<= c2 1.0e-6) (<= c3 1.0e-6) (<= c4 1.0e-6)))
+)
+
+(defun hw:in-rects (p rects / q ok)
+  (foreach q rects
+    (if (and (not ok) (hw:in-quad p q))
+      (setq ok T)
+    )
+  )
+  ok
+)
+
+(defun hw:on-line (p lines / l ok dx dy tt pp)
+  (foreach l lines
+    (if (not ok)
+      (progn
+        (setq dx (- (car p) (car (car l)))
+              dy (- (cadr p) (cadr (car l)))
+              tt (+ (* (nth 1 l) dx) (* (nth 2 l) dy))
+              pp (abs (- (* (nth 1 l) dy) (* (nth 2 l) dx)))
+        )
+        (if (and (>= tt -1.0e-3) (<= tt (+ (nth 3 l) 1.0e-3)) (< pp 1.0e-3))
+          (setq ok T)
+        )
+      )
+    )
+  )
+  ok
+)
+
+;; gap between two collinear wall pieces: fill only if both faces are
+;; supported (a continuous wall line, or another wall touching the face)
+(defun hw:gap-test (r1 r2 rects lines / ux uy om ox t1 t2 tm)
+  (setq ux (nth 4 r1)
+        uy (nth 5 r1)
+        om (nth 6 r1)
+        ox (nth 7 r1)
+        t1 (nth 9 r1)
+        t2 (nth 8 r2)
+        tm (/ (+ t1 t2) 2.0)
+  )
+  (if (and (or (hw:on-line (hw:uv ux uy tm om) lines)
+               (hw:in-rects (hw:uv ux uy tm (- om 0.02)) rects))
+           (or (hw:on-line (hw:uv ux uy tm ox) lines)
+               (hw:in-rects (hw:uv ux uy tm (+ ox 0.02)) rects)))
+    (list (hw:uv ux uy tm (/ (+ om ox) 2.0))
+          (list (append (hw:uv ux uy t1 om) (list 0.0))
+                (append (hw:uv ux uy t2 om) (list 0.0))
+                (append (hw:uv ux uy t2 ox) (list 0.0))
+                (append (hw:uv ux uy t1 ox) (list 0.0))))
+    nil
+  )
+)
+
+(defun hw:gap-fill (rects lines / res done rest a b r1 r2 g f c)
+  (setq rest rects)
+  (while rest
+    (setq a    (car rest)
+          rest (cdr rest)
+    )
+    (foreach b rest
+      (if (and (not (nth 10 a)) (not (nth 10 b))
+               (< (abs (- (nth 4 a) (nth 4 b))) 1.0e-4)
+               (< (abs (- (nth 5 a) (nth 5 b))) 1.0e-4)
+               (< (abs (- (nth 6 a) (nth 6 b))) 5.0e-4)
+               (< (abs (- (nth 7 a) (nth 7 b))) 5.0e-4))
+        (progn
+          (setq r1 nil r2 nil)
+          (cond
+            ((>= (nth 8 b) (nth 9 a)) (setq r1 a r2 b))
+            ((>= (nth 8 a) (nth 9 b)) (setq r1 b r2 a))
+          )
+          ;; Never refill the specific end gap cut by a column boundary.
+          (if (and r1 (or (nth 12 r1) (nth 11 r2)))
+            (setq r1 nil r2 nil))
+          (if r1
+            (progn
+              (setq g (- (nth 8 r2) (nth 9 r1)))
+              (if (and (> g 1.0e-4) (<= g (+ *hw-max* 1.0e-4)))
+                (progn
+                  (setq f (hw:gap-test r1 r2 rects lines))
+                  (if f
+                    (if (not (vl-some '(lambda (c) (< (distance c (car f)) 1.0e-3)) done))
+                      (setq done (cons (car f) done)
+                            res  (cons (cadr f) res))
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+    )
+  )
+  res
+)
+
+
+;;; ---------------- conservative residual L/T patching ----------------
+
+(defun hw:pt-seg-dist (p a b / dx dy ll tt q)
+  (setq dx (- (car b) (car a))
+        dy (- (cadr b) (cadr a))
+        ll (+ (* dx dx) (* dy dy)))
+  (if (< ll 1.0e-12)
+    (distance p a)
+    (progn
+      (setq tt (/ (+ (* (- (car p) (car a)) dx)
+                   (* (- (cadr p) (cadr a)) dy)) ll)
+            tt (max 0.0 (min 1.0 tt))
+            q (list (+ (car a) (* tt dx))
+                    (+ (cadr a) (* tt dy))))
+      (distance p q)))
+)
+
+(defun hw:poly-center (poly / p sx sy n)
+  (setq sx 0.0 sy 0.0 n 0)
+  (foreach p poly
+    (setq sx (+ sx (car p))
+          sy (+ sy (cadr p))
+          n (1+ n)))
+  (if (> n 0) (list (/ sx n) (/ sy n)) nil)
+)
+
+;; True when the candidate touches/intersects a rectangle or comes within tol.
+(defun hw:poly-near-rect-p (poly rr tol / q p v i j a b near)
+  (setq q (hw:rect->poly rr))
+  (foreach p poly
+    (if (hw:in-quad p q) (setq near T)))
+  (foreach p q
+    (if (hw:in-quad p poly) (setq near T)))
+  (setq i 0)
+  (while (and (< i (length poly)) (not near))
+    (setq a (nth i poly)
+          b (nth (rem (1+ i) (length poly)) poly))
+    (setq j 0)
+    (while (and (< j (length q)) (not near))
+      (if (<= (hw:pt-seg-dist a (nth j q) (nth (rem (1+ j) (length q)) q)) tol)
+        (setq near T))
+      (if (<= (hw:pt-seg-dist (nth j q) a b) tol)
+        (setq near T))
+      (setq j (1+ j)))
+    (setq i (1+ i)))
+  near
+)
+
+;; Sample interior points rather than boundary vertices, so merely touching a
+;; column face is allowed but any meaningful incursion into a column is rejected.
+(defun hw:poly-enters-columns-p (poly edges / ctr p ip bad)
+  (if edges
+    (progn
+      (setq ctr (hw:poly-center poly))
+      (if (and ctr (hw:point-in-columns-p ctr edges))
+        (setq bad T))
+      (foreach p poly
+        (if (not bad)
+          (progn
+            (setq ip (list (+ (* 0.80 (car p)) (* 0.20 (car ctr)))
+                           (+ (* 0.80 (cadr p)) (* 0.20 (cadr ctr)))))
+            (if (hw:point-in-columns-p ip edges)
+              (setq bad T)))))
+    )
+  )
+  bad
+)
+
+;; Test whether the sampled boundary and center of a candidate are already
+;; covered by accepted rectangles. If any sample is uncovered, retain the patch
+;; so a covered center cannot hide a missing narrow end of the candidate.
+(defun hw:poly-covered-by-rects-p (poly rects / samples p i a b ctr all-covered)
+  (setq samples nil
+        ctr (hw:poly-center poly)
+        i 0
+        all-covered T)
+  (if ctr (setq samples (cons ctr samples)))
+  (while (< i (length poly))
+    (setq a (nth i poly)
+          b (nth (rem (1+ i) (length poly)) poly)
+          samples (cons a samples)
+          samples (cons (list (/ (+ (car a) (car b)) 2.0)
+                              (/ (+ (cadr a) (cadr b)) 2.0)) samples)
+          i (1+ i)))
+  (if (null rects) (setq all-covered nil))
+  (foreach p samples
+    (if (not (hw:in-rects p rects))
+      (setq all-covered nil)))
+  all-covered
+)
+
+;; Find only those partial, valid-thickness spans rejected by the complete-pair
+;; test. Sample checks avoid unnecessary duplicate patches while preserving an
+;; uncovered end; column checks keep recovery away from column footprints.
+(defun hw:transition-patches (lines rects col-edges max-thick
+                              / rest a rr b lim cand poly ctr centers result)
+  (setq rest lines centers nil result nil)
+  (while rest
+    (setq a (car rest)
+          rest (cdr rest)
+          rr rest
+          lim (+ (nth 6 a) max-thick 1.0e-3))
+    (while (and rr (<= (nth 4 (car rr)) lim))
+      (setq b (car rr)
+            rr (cdr rr))
+      (if (and (<= (nth 5 a) (+ (nth 7 b) max-thick 1.0e-3))
+               (>= (nth 7 a) (- (nth 5 b) max-thick 1.0e-3))
+               (not (hw:line-pair a b)))
+        (if (setq cand (hw:line-pair-clipped a b))
+          (progn
+            (setq poly (hw:rect->poly cand)
+                  ctr (hw:poly-center poly))
+            (if (and ctr
+                     (not (hw:point-in-columns-p ctr col-edges))
+                     (not (hw:poly-enters-columns-p poly col-edges))
+                     (not (vl-some '(lambda (p) (< (distance p ctr) 0.003)) centers))
+                     (not (vl-some '(lambda (r)
+                                      (hw:in-quad ctr (hw:rect->poly r))) result)))
+              (setq centers (cons ctr centers)
+                    result (cons cand result))))))))
+  result
+)
+
+;; Recover only short, slightly over-thick wall pieces at a supported L/T
+;; junction. The normal pair test always runs first with the original limit.
+(defun hw:residual-junction-patches (lines rects col-edges base-max
+                                     / *hw-max* rest a rr b lim cand poly ctr
+                                       support ok dx dy crossang span centers c patch-list)
+  (setq *hw-max* base-max
+        rest lines
+        centers nil)
+  (while rest
+    (setq a (car rest)
+          rest (cdr rest)
+          rr rest
+          lim (+ (nth 6 a) base-max 0.021))
+    (while (and rr (<= (nth 4 (car rr)) lim))
+      (setq b (car rr)
+            rr (cdr rr))
+      (if (and (<= (nth 5 a) (+ (nth 7 b) base-max 0.021))
+               (>= (nth 7 a) (- (nth 5 b) base-max 0.021))
+               (not (hw:line-pair a b)))
+        (progn
+          ;; The 2 cm allowance exists only in this conservative fallback.
+          (setq *hw-max* (+ base-max 0.02)
+                cand (hw:line-pair a b)
+                *hw-max* base-max)
+          (if cand
+            (progn
+              (setq span (abs (- (nth 9 cand) (nth 8 cand)))
+                    poly (hw:rect->poly cand)
+                    ctr (hw:poly-center poly)
+                    ok nil)
+              ;; Keep the fallback local: no more than twice the original
+              ;; maximum wall thickness along the wall direction.
+              (if (and (<= span (+ (* 2.0 base-max) 1.0e-4))
+                       ctr
+                       (not (hw:in-rects ctr rects))
+                       (not (hw:poly-enters-columns-p poly col-edges)))
+                (foreach support rects
+                  (if (not ok)
+                    (progn
+                      (setq crossang
+                        (abs (- (* (nth 1 a) (nth 5 support))
+                                (* (nth 2 a) (nth 4 support)))))
+                      ;; Require a genuine L/T-style direction change and
+                      ;; direct support from an already accepted wall hatch.
+                      (if (and (> crossang 0.50)
+                               (hw:poly-near-rect-p poly support 0.025))
+                        (setq ok T))))))
+              (if (and ok
+                       (not (vl-some
+                         '(lambda (c) (< (distance c ctr) 0.01)) centers))
+                       (not (vl-some
+                         '(lambda (r) (hw:in-quad ctr (hw:rect->poly r))) rects)))
+                (setq centers (cons ctr centers)
+                      patch-list (cons cand patch-list)))))))))
+  patch-list
+)
+
+;; Fill an uncovered cell where two accepted wall strips meet at a right angle.
+;; The calculation uses projected strip limits, avoiding polygon clipping.
+(defun hw:perpendicular-junction-patches
+       (rects col-edges max-thick coverage
+        / rest a rr b ux uy dot crossang tmin tmax omin omax p tx ox
+          tpad opad lo hi ilo ihi patch ctr area2 centers result)
+  (setq rest rects centers nil result nil)
+  (while rest
+    (setq a (car rest)
+          rest (cdr rest)
+          rr rest
+          ux (nth 4 a)
+          uy (nth 5 a))
+    (while rr
+      (setq b (car rr)
+            rr (cdr rr)
+            dot (+ (* ux (nth 4 b)) (* uy (nth 5 b)))
+            crossang (abs (- (* ux (nth 5 b)) (* uy (nth 4 b)))))
+      (if (> crossang 0.995)
+        (progn
+          (setq tmin nil tmax nil omin nil omax nil)
+          (foreach p (hw:rect->poly b)
+            (setq tx (+ (* ux (car p)) (* uy (cadr p)))
+                  ox (+ (* (- uy) (car p)) (* ux (cadr p)))
+                  tmin (if tmin (min tmin tx) tx)
+                  tmax (if tmax (max tmax tx) tx)
+                  omin (if omin (min omin ox) ox)
+                  omax (if omax (max omax ox) ox)))
+          ;; Extend only along each wall's own direction.
+          (setq tpad (* max-thick (abs dot))
+                opad (* max-thick crossang)
+                lo (max (- (nth 8 a) max-thick) (- tmin tpad))
+                hi (min (+ (nth 9 a) max-thick) (+ tmax tpad))
+                ilo (max (nth 6 a) (- omin opad))
+                ihi (min (nth 7 a) (+ omax opad)))
+          (if (and (> (- hi lo) 1.0e-5)
+                   (> (- ihi ilo) 1.0e-5))
+            (progn
+              (setq patch
+                (list (append (hw:uv ux uy lo ilo) (list 0.0))
+                      (append (hw:uv ux uy hi ilo) (list 0.0))
+                      (append (hw:uv ux uy hi ihi) (list 0.0))
+                      (append (hw:uv ux uy lo ihi) (list 0.0)))
+                    ctr (hw:poly-center patch)
+                    area2 (* 2.0 (- hi lo) (- ihi ilo)))
+              (if (and (> area2 1.0e-8)
+                       (<= area2 (+ (* 2.0 max-thick max-thick) 1.0e-5))
+                       (not (hw:poly-enters-columns-p patch col-edges))
+                       (not (hw:poly-covered-by-rects-p patch coverage))
+                       (hw:poly-near-rect-p patch a 0.025)
+                       (hw:poly-near-rect-p patch b 0.025)
+                       (not (vl-some '(lambda (c) (< (distance c ctr) 0.01)) centers)))
+                (setq centers (cons ctr centers)
+                      result (cons patch result)))))))))
+  result
+)
+
+;;; ---------------- hatch creation ----------------
+
+(defun hw:ensure-layer (name col / rec color-entry new-color)
+  (if (not (tblsearch "LAYER" name))
+    (entmake (list '(0 . "LAYER")
+                   '(100 . "AcDbSymbolTableRecord")
+                   '(100 . "AcDbLayerTableRecord")
+                   (cons 2 name)
+                   '(70 . 0)
+                   (cons 62 col)
+                   '(6 . "Continuous")))
+  )
+  ;; Keep WALL-HATCH at the requested color even if the layer already exists.
+  ;; Preserve a negative color value, which means the layer is turned off.
+  (if (setq rec (tblsearch "LAYER" name))
+    (if (setq color-entry (assoc 62 rec))
+      (progn
+        (setq new-color (if (< (cdr color-entry) 0) (- col) col))
+        (if (/= (cdr color-entry) new-color)
+          (entmod (subst (cons 62 new-color) color-entry rec))
+        )
+      )
+    )
+  )
+)
+
+(defun hw:try-hatch (pts layer flag / hb el p)
+  (setq hb (if (vl-some '(lambda (q) (> (abs (caddr q)) 1.0e-9)) pts) 1 0))
+  (setq el (list '(0 . "HATCH")
+                 '(100 . "AcDbEntity")
+                 (cons 8 layer)
+                 '(62 . 8)
+                 '(100 . "AcDbHatch")
+                 '(10 0.0 0.0 0.0)
+                 '(210 0.0 0.0 1.0)
+                 '(2 . "SOLID")
+                 '(70 . 1)
+                 '(71 . 0)
+                 '(91 . 1)
+                 (cons 92 flag)
+                 (cons 72 hb)
+                 '(73 . 1)
+                 (cons 93 (length pts))))
+  (foreach p pts
+    (setq el (append el (list (list 10 (car p) (cadr p)))))
+    (if (= hb 1)
+      (setq el (append el (list (cons 42 (caddr p)))))
+    )
+  )
+  (setq el (append el (list '(97 . 0) '(75 . 0) '(76 . 1) '(98 . 0))))
+  (entmake el)
+)
+
+(defun hw:make-hatch (pts layer / flag r)
+  (foreach flag '(7 3 2)
+    (if (not r)
+      (setq r (hw:try-hatch pts layer flag))
+    )
+  )
+  r
+)
+
+;;; ---------------- main command ----------------
+
+(defun c:HWALL (/ *error* oldecho uopen v ss i en lay sg sg2 typ lines wall-lines col-edges wl
+                  arcs rects rescue transition polys fills rest rr lim a b r pl sn cnt fail
+                  *hw-lines*)
+  (vl-load-com)
+
+  (defun *error* (msg)
+    (if oldecho (setvar "CMDECHO" oldecho))
+    (if uopen (command "_.UNDO" "_END"))
+    (if (and msg (not (wcmatch (strcase msg) "*BREAK*,*CANCEL*,*EXIT*")))
+      (princ (strcat "\nHWALL error: " msg))
+    )
+    (princ)
+  )
+
+  (setq oldecho (getvar "CMDECHO"))
+
+  (initget 6)
+  (setq v (getreal (strcat "\nMax wall thickness in meters <" (rtos *hw-max* 2 3) ">: ")))
+  (if v (setq *hw-max* v))
+
+  (cond
+    ((<= *hw-max* *hw-min*)
+     (princ "\nMax thickness must be greater than 0.05 m.")
+    )
+    (t
+     (prompt "\nSelect the drawing (only layers containing WALL are used): ")
+     (setq ss (ssget '((0 . "LINE,LWPOLYLINE,ARC,MLINE"))))
+     (if (not ss)
+       (princ "\nNothing selected.")
+       (progn
+         (setvar "CMDECHO" 0)
+         (command "_.UNDO" "_BEGIN")
+         (setq uopen T)
+
+         ;; Collect wall geometry and COLUMN boundary edges independently.
+         ;; COLUMN-HATCH layers are ignored by hw:column-layer-p.
+         (setq i 0)
+         (repeat (sslength ss)
+           (setq en  (ssname ss i)
+                 i   (1+ i)
+                 lay (cdr (assoc 8 (entget en)))
+                 typ (cdr (assoc 0 (entget en)))
+           )
+           (if (and (hw:column-layer-p lay)
+                    (member typ '("LINE" "LWPOLYLINE")))
+             (foreach sg (hw:ent-segs en)
+               (if (eq (car sg) 'L)
+                 (setq col-edges (cons (list (cadr sg) (caddr sg)) col-edges)))))
+           (if (hw:wall-layer-p lay)
+             (foreach sg (hw:ent-segs en)
+               (if (eq (car sg) 'L)
+                 (setq wall-lines (cons (list (cadr sg) (caddr sg)) wall-lines))
+                 (setq arcs (cons (cdr sg) arcs)))))
+         )
+
+         ;; Split straight wall lines at column boundaries; keep only outside pieces.
+         (foreach wl wall-lines
+           (foreach sg2 (hw:trim-wall-seg (car wl) (cadr wl) col-edges)
+             (setq lines (cons (hw:make-line-core (car sg2) (cadr sg2)
+                                                   (caddr sg2) (cadddr sg2)) lines))))
+
+         ;; straight walls: sweep on min X to limit the pair tests
+         (setq lines (vl-sort lines '(lambda (p q) (< (nth 4 p) (nth 4 q))))
+               *hw-lines* lines
+         )
+         (setq rest lines)
+         (while rest
+           (setq a    (car rest)
+                 rest (cdr rest)
+                 rr   rest
+                 lim  (+ (nth 6 a) *hw-max* 1.0e-3)
+           )
+           (while (and rr (<= (nth 4 (car rr)) lim))
+             (setq b  (car rr)
+                   rr (cdr rr)
+             )
+             (if (and (<= (nth 5 a) (+ (nth 7 b) *hw-max* 1.0e-3))
+                      (>= (nth 7 a) (- (nth 5 b) *hw-max* 1.0e-3)))
+               (if (setq r (hw:line-pair a b))
+                 (setq rects (cons r rects))
+               )
+             )
+           )
+         )
+
+         ;; Conservative recovery of tiny residual L/T junction pieces.
+         ;; This pass does not alter the normal wall-pair logic.
+         (setq rescue (hw:residual-junction-patches lines rects col-edges *hw-max*))
+
+         ;; Recover valid portions of wall pairs whose thickness changes along
+         ;; their overlap and therefore failed the original whole-pair test.
+         (setq transition (hw:transition-patches lines rects col-edges *hw-max*))
+
+         ;; curved walls
+         (setq rest arcs)
+         (while rest
+           (setq a    (car rest)
+                 rest (cdr rest)
+           )
+           (foreach b rest
+             (foreach pl (hw:arc-pair a b)
+               (setq polys (cons pl polys))
+             )
+           )
+         )
+
+         ;; boundaries for straight walls + junction fills
+         (foreach r rects
+           (setq polys (cons (hw:rect->poly r) polys))
+         )
+         ;; Only the small, supported residual L/T patches from the fallback.
+         (foreach r rescue
+           (setq polys (cons (hw:rect->poly r) polys))
+         )
+         ;; Add the valid-thickness subspans missed by the original full-pair test.
+         ;; Skip a subspan already covered by a normal or rescue rectangle.
+         (foreach r transition
+           (setq pl (hw:rect->poly r)
+                 sg (hw:poly-center pl))
+           (if (and sg
+                    (not (hw:poly-covered-by-rects-p pl (append rects rescue)))
+                    (not (hw:poly-enters-columns-p pl col-edges)))
+             (setq polys (cons pl polys))
+           )
+         )
+         (setq fills (hw:gap-fill rects lines))
+         (setq fills
+           (append
+             (hw:perpendicular-junction-patches
+               rects col-edges *hw-max* (append rects rescue transition))
+             fills))
+         (foreach pl fills
+           (setq polys (cons pl polys))
+         )
+
+         ;; create hatches
+         (setq sn (ssadd) cnt 0 fail 0)
+         (if polys
+           (progn
+             (hw:ensure-layer "WALL-HATCH" 8)
+             (foreach pl polys
+               (if (hw:make-hatch pl "WALL-HATCH")
+                 (progn
+                   (ssadd (entlast) sn)
+                   (setq cnt (1+ cnt))
+                 )
+                 (setq fail (1+ fail))
+               )
+             )
+             (if (> cnt 0)
+               (command "_.DRAWORDER" sn "" "_B")
+             )
+           )
+         )
+
+         (command "_.UNDO" "_END")
+         (setq uopen nil)
+
+         (cond
+           ((null polys)
+            (princ "\nHWALL: no wall pairs found. Check the layer name (must contain WALL) and the max thickness.")
+           )
+           (t
+            (princ (strcat "\nHWALL: " (itoa cnt) " hatch pieces created on layer WALL-HATCH"
+                           " (" (itoa (length fills)) " junction fills)."
+                           (if (> fail 0)
+                             (strcat " Failed: " (itoa fail) ".")
+                             "")))
+           )
+         )
+       )
+     )
+    )
+  )
+
+  (if oldecho (setvar "CMDECHO" oldecho))
+  (princ)
+)
+
+(princ "\nHWALL loaded. Type HWALL to start.")
 (princ)
